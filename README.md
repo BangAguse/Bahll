@@ -222,14 +222,6 @@ Always verify outputs and use in production with caution. Bahll is designed for 
 ### Main Menu
 <img src="docs/assets/screenshot_main_menu.png" alt="Main Menu" width="500" />
 
-### Hashing Example
-<img src="docs/assets/screenshot_hash.png" alt="Hashing" width="500" />
-
-### Encryption Demo
-<img src="docs/assets/screenshot_encrypt.png" alt="Encryption" width="500" />
-
-*Screenshots show the interactive CLI in action. Add your own by placing images in `docs/assets/`.*
-
 ## Contributing
 
 We welcome contributions! Here's how to get started:
