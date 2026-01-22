@@ -1,25 +1,31 @@
 
 <div align="center">
+  <img src="docs/assets/bahll_banner.png" alt="Bahll Banner" width="600" />
+
   <h1>🔐 Bahll Cryptography Suite</h1>
   <p><em>Authority over your cryptography.</em></p>
 
+  <!-- Badges -->
   <p>
     <img alt="PHP" src="https://img.shields.io/badge/php-%3E%3D7.4-8892BF.svg" />
-    <img alt="Status" src="https://img.shields.io/badge/status-alpha-orange.svg" />
+    <img alt="Status" src="https://img.shields.io/badge/status-stable-green.svg" />
     <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
-    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/BangAguse/bahll/ci.yml" />
+    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/BangAguse/Bahll/ci.yml" />
+    <img alt="Security" src="https://img.shields.io/badge/security-fail--closed-red.svg" />
+  </p>
+
+  <!-- Demo GIF -->
+  <p>
+    <img src="docs/assets/demo.gif" alt="Bahll CLI Demo" width="600" />
   </p>
 
   <p>
-    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Bahll" width="480" />
-  </p>
-
-  <p>
-    <a href="#features">Features</a> •
-    <a href="#installation">Installation</a> •
-    <a href="#usage">Usage</a> •
-    <a href="#security">Security</a> •
-    <a href="#contributing">Contributing</a>
+    <a href="#features">🔑 Features</a> •
+    <a href="#installation">📦 Installation</a> •
+    <a href="#usage">🚀 Usage</a> •
+    <a href="#security">🛡️ Security</a> •
+    <a href="#screenshots">📸 Screenshots</a> •
+    <a href="#contributing">🤝 Contributing</a>
   </p>
 </div>
 
@@ -27,7 +33,7 @@
 
 ## Overview
 
-Bahll is a **terminal-first, defensive cryptography toolkit** designed for developers who need reliable, secure crypto operations without the complexity of custom implementations. Built with PHP, it provides an interactive CLI menu for hashing, encryption, key management, auditing, and more — all while enforcing secure-by-default practices.
+Bahll is a **terminal defensive cryptography toolkit** designed for developers who need reliable, secure crypto operations without the complexity of custom implementations. Built with PHP, it provides an interactive CLI menu for hashing, encryption, key management, auditing, and more — all while enforcing secure-by-default practices.
 
 Whether you're a developer integrating crypto into your app, a security engineer auditing secrets, or just experimenting with cryptography, Bahll gives you authority over your crypto workflows.
 
@@ -36,86 +42,126 @@ Whether you're a developer integrating crypto into your app, a security engineer
 Bahll offers a comprehensive suite of cryptographic tools, organized into intuitive categories:
 
 ### 🔑 Hashing & Key Derivation Functions (KDF)
-- **SHA-1** (with deprecation warning)
-- **SHA-256, SHA-512**
+- **SHA-1** (⚠️ with deprecation warning)
+- **SHA-256, SHA-512** 🛡️
 - **SHA3** (when available)
 - **BLAKE2 / BLAKE3** (availability checked)
-- **HMAC** for message authentication
-- **PBKDF2** for password-based key derivation
-- **bcrypt** and **scrypt** for secure password hashing
-- **Argon2id** for modern KDF
+- **HMAC** 🔐 for message authentication
+- **PBKDF2** 🏗️ for password-based key derivation
+- **bcrypt** and **scrypt** 🔒 for secure password hashing
+- **Argon2id** 🏆 for modern KDF
 
 ### 🔒 Symmetric Encryption
-- **AES-256-GCM** (default, AEAD mode)
-- **AES-CBC** (with HMAC, warned as insecure without AEAD)
-- **ChaCha20-Poly1305** (when libsodium available)
-- Password-based encryption with automatic IV/salt handling
-- File and string encryption/decryption
+- **AES-256-GCM** (default, AEAD mode) 🛡️
+- **AES-CBC** (with HMAC, warned as insecure without AEAD) ⚠️
+- **ChaCha20-Poly1305** (when libsodium available) 🔐
+- Password-based encryption with automatic IV/salt handling 🔑
+- File and string encryption/decryption 📁
 
 ### 🔐 Asymmetric Cryptography
-- **RSA** keypair generation (2048+ bits enforced)
-- **Ed25519** for fast, secure signing
+- **RSA** keypair generation (2048+ bits enforced) 🔑
+- **Ed25519** for fast, secure signing 📝
 - **ECDSA** support
-- **X25519** for key exchange
-- Sign and verify files/messages
-- Key strength validation
+- **X25519** for key exchange 🔄
+- Sign and verify files/messages ✅
+- Key strength validation 🛡️
 
 ### 🗝️ Key Management
-- **Encrypted local keyring** with passphrase protection
-- Import/export keys securely
-- Key rotation and expiration
-- List keys with metadata
-- Enforce strong passphrase policies
+- **Encrypted local keyring** with passphrase protection 🔒
+- Import/export keys securely 📤📥
+- Key rotation and expiration ⏰
+- List keys with metadata 📋
+- Enforce strong passphrase policies 🛡️
 
 ### 📝 Encoding & Obfuscation
-- **Base64** (standard and URL-safe)
-- **Base32** and **Base58**
-- **Hex** encoding/decoding
-- **ASCII armor** for PEM-like formats
+- **Base64** (standard and URL-safe) 🔤
+- **Base32** and **Base58** 🔢
+- **Hex** encoding/decoding 🔟
+- **ASCII armor** for PEM-like formats 📄
 
 ### 🎲 Randomness & Entropy
-- **CSPRNG** token generation
-- Secure password generator
-- Entropy warnings for weak sources
+- **CSPRNG** token generation 🎰
+- Secure password generator 🔑
+- Entropy warnings ⚠️ for weak sources
 
 ### 🔍 Crypto Audit & Validation
-- Detect weak keys and insecure ciphers
-- Warn on deprecated algorithms
-- Human-readable security reports
-- Score your crypto configurations
+- Detect weak keys and insecure ciphers 🔍
+- Warn on deprecated algorithms ⚠️
+- Human-readable security reports 📊
+- Score your crypto configurations 🏆
 
 ### 🔄 Secret Lifecycle Management
-- Scan files for secrets
-- Mask and rotate secrets
-- Revoke keys and enforce expiration
-- Pre-commit hooks for security scans
+- Scan files for secrets 🔎
+- Mask and rotate secrets 🔄
+- Revoke keys and enforce expiration ⏰
+- Pre-commit hooks for security scans 🪝
 
 ### 🛠️ Dev & CI Utilities
-- Pre-commit security scanning
-- Artifact signing and verification
-- Release integrity checks
-- Machine-readable CI output
+- Pre-commit security scanning 🪝
+- Artifact signing and verification ✍️
+- Release integrity checks ✅
+- Machine-readable CI output 🤖
 
 ### 🔌 Plugin System
-- Extensible architecture for custom crypto components
-- Safe module loading
-- Folder-based plugin discovery
+- Extensible architecture for custom crypto components 🧩
+- Safe module loading 🛡️
+- Folder-based plugin discovery 📁
 
-## Requirements
+## Project Structure
 
-- **PHP 7.4+** or **8.0+**
-- **OpenSSL extension** (recommended)
-- **Sodium extension** (for advanced features like Ed25519, ChaCha20)
-- **Composer** (optional, for autoloading)
+```
+Bahll/
+├─ bahll.php          # Main entry point
+├─ setup.php          # Environment setup script
+├─ composer.json      # PHP dependencies config
+├─ core/              # Core crypto modules
+│  ├─ crypto/         # Hash, Symmetric, Asymmetric
+│  ├─ keyring/        # Encrypted key storage
+├─ cli/               # CLI interface
+│  ├─ menu/           # Interactive menus
+│  ├─ input/          # Input handling
+│  ├─ output/         # Output rendering
+├─ utils/             # Utilities (e.g., constant-time compare)
+├─ storage/           # Encrypted data storage
+├─ plugins/           # Extensible plugins
+├─ tests/             # Unit tests
+├─ docs/assets/       # Documentation assets
+└─ README.md          # This file
+```
 
-Bahll will check for these during setup and guide you on missing dependencies.
+## Architecture
+
+Bahll follows a **modular, CLI-first architecture**:
+- **No web dependencies**: Pure terminal tool.
+- **Plugin system**: Safe loading of custom components.
+- **Encrypted storage**: Keyring uses libsodium AEAD for security.
+- **Fail-closed design**: Errors halt execution with clear messages.
+- **PSR-4 autoloading**: Standard PHP structure.
+
+Built for developers, by developers — secure, simple, and extensible.
+
+### Workflow Diagram
+```
+User Input → CLI Menu → Core Module → Secure Operation → Output
+     ↓           ↓          ↓            ↓             ↓
+  Prompt    Navigation  Hash/Sym/Asym  Validation   Result
+```
+
+### Security Layers
+| Layer | Description | Tech |
+|-------|-------------|------|
+| Input | Sanitized prompts | PHP CLI |
+| Crypto | Audited primitives | OpenSSL/Sodium |
+| Storage | Encrypted keyring | AEAD (XChaCha20) |
+| Audit | Real-time checks | Built-in validators |
+| Output | Clear error messages | Fail-closed |
 
 ## Installation
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/BangAguse/bahll.git
-   cd bahll
+   git clone https://github.com/BangAguse/Bahll.git
+   cd Bahll
    ```
 
 2. **Run the setup script:**
@@ -170,7 +216,20 @@ Bahll is built with a **fail-closed, defensive mindset**:
 - Warns on deprecated algorithms (SHA-1)
 - No custom crypto — only audited, standard primitives
 
-Always verify outputs and use in production with caution. Bahll is alpha software.
+Always verify outputs and use in production with caution. Bahll is designed for secure development workflows.
+
+## Screenshots
+
+### Main Menu
+<img src="docs/assets/screenshot_main_menu.png" alt="Main Menu" width="500" />
+
+### Hashing Example
+<img src="docs/assets/screenshot_hash.png" alt="Hashing" width="500" />
+
+### Encryption Demo
+<img src="docs/assets/screenshot_encrypt.png" alt="Encryption" width="500" />
+
+*Screenshots show the interactive CLI in action. Add your own by placing images in `docs/assets/`.*
 
 ## Contributing
 
@@ -190,4 +249,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-*Built with ❤️ for secure development workflows.*
+*Built with ❤️ for secure development workflows. Replace the demo GIF with a repository asset for offline viewing.*
