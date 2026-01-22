@@ -1,0 +1,14 @@
+{
+    "name": "bahll/cryptotool",
+    "description": "Bahll Cryptography Suite - CLI",
+    "type": "project",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-openssl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bahll\\": ""
+        }
+    }
+}
