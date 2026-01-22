@@ -10,7 +10,6 @@
     <img alt="PHP" src="https://img.shields.io/badge/php-%3E%3D7.4-8892BF.svg" />
     <img alt="Status" src="https://img.shields.io/badge/status-stable-green.svg" />
     <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
-    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/BangAguse/Bahll/ci.yml" />
     <img alt="Security" src="https://img.shields.io/badge/security-fail--closed-red.svg" />
   </p>
 
