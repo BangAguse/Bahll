@@ -1,0 +1,65 @@
+# Bahll Cryptography Suite .gitignore
+
+# PHP
+/vendor/
+/composer.lock
+/composer.phar
+
+# Storage (sensitive files - keyrings, etc.)
+/storage/*.enc
+/storage/*.salt
+/storage/keyring.json.enc
+/storage/keyring.salt
+
+# Logs and temp files
+*.log
+/tmp/
+/temp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Tests
+/tests/cache/
+/tests/temp/
+
+# Plugins (if any generated files)
+/plugins/*.tmp
+
+# Docs assets (if not committed)
+/docs/assets/demo.gif
+/docs/assets/*.png
+/docs/assets/*.jpg
+
+# Build artifacts (if any)
+/build/
+/dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Node.js (if any frontend assets, but unlikely)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
