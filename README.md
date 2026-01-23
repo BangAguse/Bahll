@@ -2,7 +2,7 @@
 <div align="center">
   <img src="docs/assets/bahll_banner.png" alt="Bahll Banner" width="600" />
 
-  <h1>🔐 Bahll Cryptography Suite</h1>
+  <h1>Bahll Cryptography Suite</h1>
   <p><em>Authority over your cryptography.</em></p>
 
   <!-- Badges -->
