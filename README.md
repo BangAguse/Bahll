@@ -13,7 +13,7 @@
     <img alt="Security" src="https://img.shields.io/badge/security-fail--closed-red.svg" />
   </p>
 
-  <!-- Demo GIF -->
+  <!-- GIF -->
   <p>
     <img src="https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyZDQ1bzFmYTYxcWdkcmh3aGIzYXRnd2MxejRuMnBmbjUzMnF6OTEwbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/077i6AULCXc0FKTj9s/giphy.gif" alt="Cryptography" width="600" />
   </p>
