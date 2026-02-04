@@ -6,10 +6,21 @@ use Bahll\CLI\Output;
 use Bahll\Core\Crypto\Hash;
 use Bahll\Core\Crypto\Symmetric;
 use Bahll\Core\Crypto\Asymmetric;
+use Bahll\Core\Crypto\FolderEncrypt;
 use Bahll\Core\Keyring\Keyring;
+use Bahll\Core\Logging\ActivityLogger;
 
 class Menu
 {
+    private ActivityLogger $logger;
+    private FolderEncrypt $folderEncrypt;
+
+    public function __construct()
+    {
+        $this->logger = new ActivityLogger();
+        $this->folderEncrypt = new FolderEncrypt();
+    }
+
     public function run(): void
     {
         $this->clearScreen();
@@ -17,7 +28,7 @@ class Menu
         $keyring = new Keyring();
 
         while (true) {
-            Output::writeln("\nMain Menu:");
+            Output::section("Main Menu");
             Output::writeln("1) Hashing & KDF");
             Output::writeln("2) Symmetric Encryption");
             Output::writeln("3) Asymmetric Crypto");
@@ -26,9 +37,13 @@ class Menu
             Output::writeln("6) Randomness & Entropy");
             Output::writeln("7) Audit & Validation");
             Output::writeln("8) Secret Lifecycle");
-            Output::writeln("9) Dev & CI Utilities");
-            Output::writeln("10) Plugins");
-            Output::writeln("0) Exit");
+            Output::writeln("9) Folder Encryption");
+            Output::writeln("10) Activity Log");
+            Output::writeln("11) Dev & CI Utilities");
+            Output::writeln("h) Help");
+            Output::writeln("i) Info");
+            Output::writeln("q) Exit");
+            Output::writeln("Type clear to clear the display");
 
             $choice = Input::prompt('Select an option');
 
@@ -58,16 +73,36 @@ class Menu
                     $this->menuSecrets();
                     break;
                 case '9':
-                    Output::writeln("Dev & CI utilities are available in the CLI.");
+                    $this->menuFolderEncrypt();
                     break;
                 case '10':
-                    Output::writeln("Plugins folder: scan available in plugins/ (safe load skeleton)");
+                    $this->menuActivityLog();
                     break;
-                case '0':
+                case '11':
+                    Output::writeln("Dev & CI utilities are available in the CLI.");
+                    break;
+                case 'h':
+                case 'H':
+                    $this->menuHelp();
+                    break;
+                case 'i':
+                case 'I':
+                    $this->menuInfo();
+                    break;
+                case 'clear':
+                case 'CLEAR':
+                case 'Clear':
+                    $this->clearScreen();
+                    Output::banner();
+                    
+                    break;
+                case 'q':
+                case 'Q':
                     Output::writeln("Bye.");
+                    $this->logger->log('Application exit', 'success');
                     exit(0);
                 default:
-                    Output::writeln("Invalid selection, try again.");
+                    Output::error("Invalid selection, try again.");
             }
         }
     }
@@ -75,15 +110,29 @@ class Menu
     private function clearScreen(): void
     {
         if (DIRECTORY_SEPARATOR === '/') {
-            echo "\033[2J\033[H";
+            
+            if (function_exists('system')) {
+                @system('clear');
+            } elseif (function_exists('exec')) {
+                @exec('clear');
+            } else {
+                
+                echo "\033[H\033[2J\033[3J";
+            }
         } else {
-            @system("cls");
+            @system('cls');
         }
+
+        
+        if (function_exists('ob_get_level') && ob_get_level() > 0) {
+            @ob_flush();
+        }
+        @flush();
     }
 
     private function menuHash(): void
     {
-        Output::writeln("\nHashing & KDF Menu:");
+        Output::section("Hashing & KDF Menu");
         Output::writeln("1) SHA-1 (deprecated)");
         Output::writeln("2) SHA-256");
         Output::writeln("3) SHA-512");
@@ -101,48 +150,81 @@ class Menu
         switch ($c) {
             case '1':
                 $d = Input::prompt('Data to hash');
-                Output::writeln(Hash::sha1($d));
+                $hash = Hash::sha1($d);
+                Output::warning("SHA-1 is deprecated and insecure");
+                Output::result('SHA-1 Hash', $hash);
+                $this->logger->logHash('SHA-1');
                 break;
             case '2':
                 $d = Input::prompt('Data to hash');
-                Output::writeln(Hash::sha256($d));
+                $hash = Hash::sha256($d);
+                Output::result('SHA-256 Hash', $hash);
+                $this->logger->logHash('SHA-256');
                 break;
             case '3':
                 $d = Input::prompt('Data to hash');
-                Output::writeln(Hash::sha512($d));
+                $hash = Hash::sha512($d);
+                Output::result('SHA-512 Hash', $hash);
+                $this->logger->logHash('SHA-512');
                 break;
             case '4':
                 $d = Input::prompt('Data to hash');
-                Output::writeln(Hash::sha3($d));
+                $hash = Hash::sha3($d);
+                if (strpos($hash, '✖') === 0) {
+                    Output::error($hash);
+                } else {
+                    Output::result('SHA3-512 Hash', $hash);
+                    $this->logger->logHash('SHA3-512');
+                }
                 break;
             case '5':
                 $d = Input::prompt('Data to hash');
-                Output::writeln(Hash::blake2($d));
+                $hash = Hash::blake2($d);
+                if (strpos($hash, '✖') === 0) {
+                    Output::error($hash);
+                } else {
+                    Output::result('BLAKE2 Hash', $hash);
+                    $this->logger->logHash('BLAKE2');
+                }
                 break;
             case '6':
-                Output::writeln(Hash::blake3(''));
+                $msg = Hash::blake3('');
+                Output::warning($msg);
                 break;
             case '7':
                 $d = Input::prompt('Data');
                 $k = Input::prompt('Key');
-                Output::writeln(Hash::hmac('sha256', $d, $k));
+                $hash = Hash::hmac('sha256', $d, $k);
+                Output::result('HMAC-SHA256', $hash);
+                $this->logger->logHash('HMAC-SHA256');
                 break;
             case '8':
                 $p = Input::prompt('Password');
                 $s = Input::prompt('Salt (leave blank to auto)');
                 $iter = (int)Input::prompt('Iterations (e.g. 100000)');
-                Output::writeln(Hash::pbkdf2($p, $s ?: null, $iter ?: 100000));
+                $hash = Hash::pbkdf2($p, $s ?: null, $iter ?: 100000);
+                Output::result('PBKDF2 Derived Key', $hash);
+                $this->logger->logHash('PBKDF2');
                 break;
             case '9':
                 $p = Input::prompt('Password');
-                Output::writeln(Hash::bcrypt($p));
+                $hash = Hash::bcrypt($p);
+                Output::result('bcrypt Hash', $hash);
+                $this->logger->logHash('bcrypt');
                 break;
             case '10':
-                Output::writeln(Hash::scrypt('')); 
+                $msg = Hash::scrypt('');
+                Output::warning($msg);
                 break;
             case '11':
                 $p = Input::prompt('Password');
-                Output::writeln(Hash::argon2id($p));
+                $hash = Hash::argon2id($p);
+                if (strpos($hash, '✖') === 0) {
+                    Output::error($hash);
+                } else {
+                    Output::result('Argon2id Hash', $hash);
+                    $this->logger->logHash('Argon2id');
+                }
                 break;
             default:
                 return;
@@ -151,11 +233,11 @@ class Menu
 
     private function menuSymmetric(): void
     {
-        Output::writeln("\nSymmetric Menu:");
+        Output::section("Symmetric Encryption");
         Output::writeln("1) AES-256-GCM encrypt string");
         Output::writeln("2) AES-256-GCM decrypt string");
-        Output::writeln("3) AES-CBC (with MAC)");
-        Output::writeln("4) ChaCha20-Poly1305 (if available)");
+        Output::writeln("3) AES-256-CBC with HMAC encrypt");
+        Output::writeln("4) AES-256-CBC with HMAC decrypt");
         Output::writeln("0) Back");
 
         $c = Input::prompt('Choice');
@@ -164,13 +246,33 @@ class Menu
                 $pt = Input::prompt('Plaintext');
                 $pw = Input::prompt('Password (leave blank to use random key)');
                 $res = Symmetric::encryptAesGcm($pt, $pw ?: null);
-                Output::writeln($res);
+                Output::result('Encrypted Data', $res);
                 break;
             case '2':
-                $blob = Input::prompt('Cipher blob (json)');
+                $blob = Input::prompt('Cipher blob (base64)');
                 $pw = Input::prompt('Password (if used)');
                 $out = Symmetric::decryptAesGcm($blob, $pw ?: null);
-                Output::writeln($out === false ? '✖ Decryption failed' : $out);
+                if ($out === false) {
+                    Output::error('Decryption failed - wrong password or corrupted data');
+                } else {
+                    Output::result('Decrypted Data', $out);
+                }
+                break;
+            case '3':
+                $pt = Input::prompt('Plaintext');
+                $pw = Input::prompt('Password');
+                $res = Symmetric::encryptAesCbcWithHmac($pt, $pw);
+                Output::result('Encrypted Data', $res);
+                break;
+            case '4':
+                $blob = Input::prompt('Cipher blob (base64)');
+                $pw = Input::prompt('Password');
+                $out = Symmetric::decryptAesCbcWithHmac($blob, $pw);
+                if ($out === false) {
+                    Output::error('Decryption failed - wrong password or MAC verification failed');
+                } else {
+                    Output::result('Decrypted Data', $out);
+                }
                 break;
             default:
                 return;
@@ -179,7 +281,7 @@ class Menu
 
     private function menuAsymmetric(): void
     {
-        Output::writeln("\nAsymmetric Menu:");
+        Output::section("Asymmetric Crypto");
         Output::writeln("1) Generate RSA keypair");
         Output::writeln("2) Generate Ed25519 keypair");
         Output::writeln("3) Sign/Verify using Ed25519");
@@ -191,25 +293,52 @@ class Menu
                 $bits = (int)Input::prompt('Key size (2048/3072/4096)');
                 $p = Input::prompt('Passphrase (optional)');
                 $kp = Asymmetric::generateRsa($bits ?: 2048, $p ?: null);
-                Output::writeln(json_encode($kp, JSON_PRETTY_PRINT));
+                if (isset($kp['error'])) {
+                    Output::error($kp['error']);
+                    $this->logger->logKeyGeneration('RSA', $bits ?: 2048);
+                } else {
+                    Output::section("RSA Keypair Generated");
+                    Output::writeln("Private Key:\n" . $kp['private']);
+                    Output::writeln("\nPublic Key:\n" . $kp['public']);
+                    $this->logger->logKeyGeneration('RSA', $bits ?: 2048);
+                }
                 break;
             case '2':
                 $kp = Asymmetric::generateEd25519();
-                Output::writeln(json_encode($kp, JSON_PRETTY_PRINT));
+                if (isset($kp['error'])) {
+                    Output::error($kp['error']);
+                } else {
+                    Output::section("Ed25519 Keypair Generated");
+                    Output::result('Private Key (hex)', $kp['private_hex']);
+                    Output::result('Public Key (hex)', $kp['public_hex']);
+                    $this->logger->logKeyGeneration('Ed25519');
+                }
                 break;
             case '3':
                 $action = Input::prompt('sign/verify');
                 if (trim($action) === 'sign') {
-                    $sk = Input::prompt('Private key (hex/base64)');
+                    $sk = Input::prompt('Private key (hex)');
                     $msg = Input::prompt('Message');
                     $sig = Asymmetric::signEd25519($sk, $msg);
-                    Output::writeln(base64_encode($sig));
+                    if (empty($sig)) {
+                        Output::error('Signing failed');
+                        $this->logger->log('Ed25519 sign', 'failed');
+                    } else {
+                        Output::result('Signature (base64)', base64_encode($sig));
+                        $this->logger->log('Ed25519 sign', 'success');
+                    }
                 } else {
-                    $pk = Input::prompt('Public key (hex/base64)');
+                    $pk = Input::prompt('Public key (hex)');
                     $msg = Input::prompt('Message');
                     $sig = base64_decode(Input::prompt('Signature (base64)'));
                     $ok = Asymmetric::verifyEd25519($pk, $msg, $sig);
-                    Output::writeln($ok ? 'Signature VALID' : 'Signature INVALID');
+                    if ($ok) {
+                        Output::success('Signature VALID');
+                        $this->logger->log('Ed25519 verify', 'success');
+                    } else {
+                        Output::error('Signature INVALID');
+                        $this->logger->log('Ed25519 verify', 'failed');
+                    }
                 }
                 break;
             default:
@@ -219,7 +348,7 @@ class Menu
 
     private function menuKeyring(Keyring $k): void
     {
-        Output::writeln("\nKeyring Menu:");
+        Output::section("Keyring Management");
         Output::writeln("1) Initialize keyring");
         Output::writeln("2) Add key");
         Output::writeln("3) List keys");
@@ -230,26 +359,50 @@ class Menu
         switch ($c) {
             case '1':
                 $pw = Input::prompt('Set passphrase for keyring');
-                $k->init($pw);
-                Output::writeln('Keyring initialized');
+                if ($k->init($pw)) {
+                    Output::success('Keyring initialized successfully');
+                    $this->logger->log('Keyring init', 'success');
+                } else {
+                    Output::error('Failed to initialize keyring');
+                    $this->logger->log('Keyring init', 'failed');
+                }
                 break;
             case '2':
                 $alias = Input::prompt('Alias');
                 $data = Input::prompt('Key data (PEM/json/base64)');
                 $pw = Input::prompt('Keyring passphrase');
-                $k->addKey($alias, $data, $pw);
-                Output::writeln('Key added');
+                if ($k->addKey($alias, $data, $pw)) {
+                    Output::success('Key added successfully');
+                    $this->logger->log("Add key to keyring - {$alias}", 'success');
+                } else {
+                    Output::error('Failed to add key');
+                    $this->logger->log("Add key to keyring - {$alias}", 'failed');
+                }
                 break;
             case '3':
                 $pw = Input::prompt('Keyring passphrase');
                 $list = $k->listKeys($pw);
-                Output::writeln(json_encode($list, JSON_PRETTY_PRINT));
+                if (empty($list)) {
+                    Output::info('No keys found');
+                } else {
+                    Output::section("Stored Keys");
+                    foreach ($list as $alias => $info) {
+                        Output::writeln("  - {$alias} (added: {$info['added']})");
+                    }
+                    $this->logger->log('List keyring keys', 'success');
+                }
                 break;
             case '4':
                 $alias = Input::prompt('Alias');
                 $pw = Input::prompt('Keyring passphrase');
                 $out = $k->exportKey($alias, $pw);
-                Output::writeln($out === false ? '✖ Not found or bad passphrase' : $out);
+                if ($out === false) {
+                    Output::error('Not found or bad passphrase');
+                    $this->logger->log("Export key - {$alias}", 'failed');
+                } else {
+                    Output::result("Key: {$alias}", $out);
+                    $this->logger->log("Export key - {$alias}", 'success');
+                }
                 break;
             default:
                 return;
@@ -258,62 +411,458 @@ class Menu
 
     private function menuEncoding(): void
     {
-        Output::writeln('\nEncoding Menu: base64, base32, base58, hex');
-        $d = Input::prompt('Data');
+        Output::section("Encoding / Obfuscation");
+        $d = Input::prompt('Data to encode');
         if ($d === null) return;
-        Output::writeln('Base64: ' . base64_encode($d));
-        Output::writeln('URL-safe Base64: ' . rtrim(strtr(base64_encode($d), '+/', '-_'), '='));
-        Output::writeln('Hex: ' . bin2hex($d));
+        
+        $b64 = base64_encode($d);
+        $b64url = rtrim(strtr($b64, '+/', '-_'), '=');
+        $hex = bin2hex($d);
+        
+        Output::writeln('');
+        Output::result('Base64', $b64);
+        Output::result('URL-safe Base64', $b64url);
+        Output::result('Hexadecimal', $hex);
+        
+        $this->logger->log('Encode data', 'success', 'Multiple formats');
     }
 
     private function menuRandom(): void
     {
-        Output::writeln('\nRandomness:');
+        Output::section("CSPRNG - Randomness Generator");
         $n = (int)Input::prompt('Bytes to generate (default 32)');
         $n = $n > 0 ? $n : 32;
+        
+        if ($n > 10000) {
+            Output::warning("Large size requested ({$n} bytes), this may be slow");
+        }
+        
         $tok = random_bytes($n);
-        Output::writeln('CSPRNG (hex): ' . bin2hex($tok));
-        Output::writeln('Password (secure): ' . bin2hex(random_bytes(16)));
+        $hex = bin2hex($tok);
+        $b64 = base64_encode($tok);
+        
+        Output::writeln('');
+        Output::result("Random Bytes (Hex) [{$n} bytes]", $hex);
+        Output::result("Random Bytes (Base64)", $b64);
+        
+        $this->logger->log('Generate random bytes', 'success', "{$n} bytes");
     }
 
     private function menuAudit(): void
     {
-        Output::writeln('\nAudit: basic checks');
-        Output::writeln('\n- Checking OpenSSL ciphers and sodium availability');
-        Output::writeln('OpenSSL: ' . (extension_loaded('openssl') ? 'available' : 'missing'));
-        Output::writeln('Sodium: ' . (extension_loaded('sodium') ? 'available' : 'missing'));
-        Output::writeln('Advice: avoid SHA-1, prefer AEAD ciphers, RSA >= 2048');
-
-        Output::writeln('\n- Cipher availability:');
+        Output::section("Security Audit & System Check");
+        
+        Output::writeln("");
+        Output::writeln("Extensions:");
+        Output::writeln("  OpenSSL: " . (extension_loaded('openssl') ? "✓ available" : "✗ missing"));
+        Output::writeln("  Sodium: " . (extension_loaded('sodium') ? "✓ available" : "✗ missing"));
+        
+        Output::writeln("\nCipher Support:");
         $ciphers = ['aes-256-gcm', 'aes-256-cbc', 'chacha20-poly1305'];
         foreach ($ciphers as $c) {
-            $avail = in_array($c, openssl_get_cipher_methods() ?? []) || function_exists('sodium_crypto_aead_chacha20poly1305_encrypt');
-            Output::writeln("  $c: " . ($avail ? 'available' : 'missing'));
+            $avail = in_array($c, openssl_get_cipher_methods() ?? []);
+            Output::writeln("  {$c}: " . ($avail ? "✓ available" : "✗ missing"));
         }
-
-        Output::writeln('\n- Hash algorithms:');
-        $hashes = ['sha256', 'sha3-512', 'blake2b512'];
+        
+        Output::writeln("\nHash Algorithms:");
+        $hashes = ['sha256', 'sha512', 'sha3-512', 'blake2b512'];
         foreach ($hashes as $h) {
-            Output::writeln("  $h: " . (in_array($h, hash_algos()) ? 'available' : 'missing'));
+            $avail = in_array($h, hash_algos());
+            Output::writeln("  {$h}: " . ($avail ? "✓ available" : "✗ missing"));
         }
-
-        Output::writeln('\n- Security score: ' . $this->calculateSecurityScore());
+        
+        Output::writeln("\nPassword Hashing:");
+        Output::writeln("  bcrypt: " . (CRYPT_BLOWFISH ? "✓ available" : "✗ missing"));
+        Output::writeln("  Argon2id: " . (defined('PASSWORD_ARGON2ID') ? "✓ available" : "✗ missing"));
+        
+        Output::writeln("\n");
+        $score = $this->calculateSecurityScore();
+        Output::highlight("Security Score: {$score}");
+        
+        Output::writeln("\nRecommendations:");
+        Output::writeln("  • Avoid SHA-1, MD5 - use SHA-256 or better");
+        Output::writeln("  • Prefer AEAD ciphers (GCM, Poly1305, ChaCha20)");
+        Output::writeln("  • Use RSA >= 2048 bits (4096 preferred)");
+        Output::writeln("  • Use Argon2id for password hashing");
+        
+        $this->logger->log('Audit system', 'success');
     }
 
-    private function calculateSecurityScore(): string
+    
+    private function calculateSecurityScore(): int
     {
         $score = 0;
-        $max = 10;
-        if (extension_loaded('openssl')) $score += 3;
-        if (extension_loaded('sodium')) $score += 3;
-        if (in_array('aes-256-gcm', openssl_get_cipher_methods() ?? [])) $score += 2;
-        if (defined('PASSWORD_ARGON2ID')) $score += 2;
-        return "$score/$max (higher is better)";
+        $total = 0;
+
+        
+        $exts = ['openssl', 'sodium'];
+        foreach ($exts as $e) {
+            $total++;
+            if (extension_loaded($e)) $score++;
+        }
+
+        
+        $ciphers = ['aes-256-gcm', 'aes-256-cbc', 'chacha20-poly1305'];
+        $availableCiphers = openssl_get_cipher_methods() ?: [];
+        foreach ($ciphers as $c) {
+            $total++;
+            if (in_array($c, $availableCiphers, true)) $score++;
+        }
+
+        
+        $hashes = ['sha256', 'sha512', 'sha3-512', 'blake2b512'];
+        $availableHashes = hash_algos();
+        foreach ($hashes as $h) {
+            $total++;
+            if (in_array($h, $availableHashes, true)) $score++;
+        }
+
+        
+        $total += 2;
+        if (defined('CRYPT_BLOWFISH') && CRYPT_BLOWFISH) $score++;
+        if (defined('PASSWORD_ARGON2ID')) $score++;
+
+        if ($total === 0) return 0;
+        return (int)round(($score / $total) * 100);
     }
 
     private function menuSecrets(): void
     {
-        Output::writeln('\nSecrets lifecycle helpers');
-        Output::writeln('Detecting secrets is available via scanning (not implemented full scan).');
+        Output::section("Secret Lifecycle Management");
+        Output::writeln("1) Generate secure password");
+        Output::writeln("2) Generate API token");
+        Output::writeln("3) Generate cryptographic salt");
+        Output::writeln("0) Back");
+        
+        $c = Input::prompt('Choice');
+        switch ($c) {
+            case '1':
+                $pwd = bin2hex(random_bytes(16));
+                Output::result('Secure Password', $pwd);
+                $this->logger->log('Generate secure password', 'success');
+                break;
+            case '2':
+                $token = base64_encode(random_bytes(32));
+                Output::result('API Token', $token);
+                $this->logger->log('Generate API token', 'success');
+                break;
+            case '3':
+                $salt = bin2hex(random_bytes(16));
+                Output::result('Cryptographic Salt', $salt);
+                $this->logger->log('Generate salt', 'success');
+                break;
+            default:
+                return;
+        }
+    }
+
+    private function menuFolderEncrypt(): void
+    {
+        Output::section("Folder Encryption Manager");
+        Output::writeln("1) View Data folder contents");
+        Output::writeln("2) Encrypt all files in Data folder");
+        Output::writeln("3) View Encrypted folder contents");
+        Output::writeln("4) Decrypt all encrypted files");
+        Output::writeln("5) Folder statistics");
+        Output::writeln("0) Back");
+
+        $c = Input::prompt('Choice');
+        switch ($c) {
+            case '1':
+                $this->viewFolderContents('data');
+                break;
+            case '2':
+                $this->performFolderEncryption();
+                break;
+            case '3':
+                $this->viewFolderContents('encrypted');
+                break;
+            case '4':
+                $this->performFolderDecryption();
+                break;
+            case '5':
+                $this->viewFolderStats();
+                break;
+            default:
+                return;
+        }
+    }
+
+    private function viewFolderContents(string $type): void
+    {
+        if ($type === 'data') {
+            $files = $this->folderEncrypt->listDataFiles();
+            $dir = $this->folderEncrypt->getDataDir();
+            $title = "Data Folder Contents";
+        } else {
+            $files = $this->folderEncrypt->listEncryptedFiles();
+            $dir = $this->folderEncrypt->getEncryptedDir();
+            $title = "Encrypted Folder Contents";
+        }
+
+        Output::section($title);
+        Output::writeln("Location: {$dir}\n");
+
+        if (empty($files)) {
+            Output::info("Folder is empty");
+            return;
+        }
+
+        foreach ($files as $file) {
+            printf("  %-50s %10s  %s\n", $file['path'], $file['size'], $file['modified']);
+        }
+
+        Output::writeln("\nTotal files: " . count($files));
+    }
+
+    private function performFolderEncryption(): void
+    {
+        $dataFiles = $this->folderEncrypt->listDataFiles();
+        if (empty($dataFiles)) {
+            Output::warning("No files found in Data folder");
+            return;
+        }
+
+        Output::info("Found " . count($dataFiles) . " file(s) ready to encrypt");
+        $password = Input::prompt('Enter encryption password');
+        
+        Output::writeln("Encrypting...");
+        $results = $this->folderEncrypt->encryptAll($password);
+
+        Output::section("Encryption Results");
+        Output::success("Successfully encrypted: " . $results['success'] . " file(s)");
+        if ($results['failed'] > 0) {
+            Output::error("Failed to encrypt: " . $results['failed'] . " file(s)");
+        }
+
+        if (!empty($results['errors'])) {
+            Output::warning("Errors encountered:");
+            foreach ($results['errors'] as $err) {
+                Output::writeln("  - {$err}");
+            }
+        }
+
+        $this->logger->logFolderEncryption($this->folderEncrypt->getDataDir(), $results['success'], $results['failed'] === 0);
+    }
+
+    private function performFolderDecryption(): void
+    {
+        $encFiles = $this->folderEncrypt->listEncryptedFiles();
+        if (empty($encFiles)) {
+            Output::warning("No encrypted files found");
+            return;
+        }
+
+        Output::info("Found " . count($encFiles) . " encrypted file(s)");
+        $password = Input::prompt('Enter decryption password');
+        
+        Output::writeln("Decrypting...");
+        $results = $this->folderEncrypt->decryptAll($password);
+
+        Output::section("Decryption Results");
+        Output::success("Successfully decrypted: " . $results['success'] . " file(s)");
+        if ($results['failed'] > 0) {
+            Output::error("Failed to decrypt: " . $results['failed'] . " file(s)");
+        }
+
+        if (!empty($results['errors'])) {
+            Output::warning("Errors encountered:");
+            foreach ($results['errors'] as $err) {
+                Output::writeln("  - {$err}");
+            }
+        }
+
+        Output::info("Decrypted files saved to: {$this->folderEncrypt->getDataDir()}_decrypted");
+        $this->logger->logFolderDecryption($this->folderEncrypt->getEncryptedDir(), $results['success'], $results['failed'] === 0);
+    }
+
+    private function viewFolderStats(): void
+    {
+        Output::section("Folder Encryption Statistics");
+        
+        $dataSize = $this->folderEncrypt->getDataDirSize();
+        $dataFiles = count($this->folderEncrypt->listDataFiles());
+        
+        $encSize = $this->folderEncrypt->getEncryptedDirSize();
+        $encFiles = count($this->folderEncrypt->listEncryptedFiles());
+        
+        Output::writeln("\nData Folder:");
+        Output::writeln("  Files: {$dataFiles}");
+        Output::writeln("  Total size: {$dataSize}");
+        
+        Output::writeln("\nEncrypted Folder:");
+        Output::writeln("  Files: {$encFiles}");
+        Output::writeln("  Total size: {$encSize}");
+        
+        if ($dataFiles > 0 && $encFiles > 0) {
+            $ratio = ($dataFiles > 0) ? round(($encFiles / $dataFiles) * 100, 2) : 0;
+            Output::writeln("\nEncryption status: {$ratio}% complete");
+        }
+        
+        $this->logger->log('View folder statistics', 'success');
+    }
+
+    private function menuActivityLog(): void
+    {
+        Output::section("Activity Log Management");
+        Output::writeln("1) View recent logs (last 20)");
+        Output::writeln("2) View all logs");
+        Output::writeln("3) Export log as base64");
+        Output::writeln("4) Clear logs");
+        Output::writeln("5) Log statistics");
+        Output::writeln("0) Back");
+
+        $c = Input::prompt('Choice');
+        switch ($c) {
+            case '1':
+                $this->displayRecentLogs(20);
+                break;
+            case '2':
+                $this->displayAllLogs();
+                break;
+            case '3':
+                $this->exportLogs();
+                break;
+            case '4':
+                $this->clearLogs();
+                break;
+            case '5':
+                $this->showLogStats();
+                break;
+            default:
+                return;
+        }
+    }
+
+    private function displayRecentLogs(int $count): void
+    {
+        $entries = $this->logger->getLastEntries($count);
+        
+        if (empty($entries)) {
+            Output::info("No log entries found");
+            return;
+        }
+
+        Output::section("Recent Activity Logs");
+        Output::writeln("");
+        
+        foreach ($entries as $entry) {
+            $time = $entry['timestamp'];
+            $status = strtoupper($entry['status']);
+            $action = $entry['action'];
+            $details = $entry['details'] ? " ({$entry['details']})" : "";
+            
+            printf("[%s] %-10s %s%s\n", $time, $status, $action, $details);
+        }
+    }
+
+    private function displayAllLogs(): void
+    {
+        $entries = $this->logger->getEntries();
+        
+        if (empty($entries)) {
+            Output::info("No log entries found");
+            return;
+        }
+
+        Output::section("Complete Activity Log");
+        Output::writeln("Total entries: " . count($entries) . "\n");
+        
+        foreach ($entries as $entry) {
+            $time = $entry['timestamp'];
+            $status = strtoupper($entry['status']);
+            $action = $entry['action'];
+            $details = $entry['details'] ? " ({$entry['details']})" : "";
+            
+            printf("[%s] %-10s %s%s\n", $time, $status, $action, $details);
+        }
+    }
+
+    private function exportLogs(): void
+    {
+        $exported = $this->logger->export();
+        
+        Output::section("Log Export (Base64)");
+        Output::writeln("");
+        Output::result("Encoded Log Data", $exported);
+        Output::writeln("\nThis data is base64-encoded and can be stored safely or shared.");
+        
+        $this->logger->log('Export activity log', 'success');
+    }
+
+    private function clearLogs(): void
+    {
+        $confirm = Input::prompt('Are you sure? This cannot be undone (yes/no)');
+        
+        if (strtolower(trim($confirm)) === 'yes') {
+            $this->logger->clear();
+            Output::success('Activity logs cleared');
+        } else {
+            Output::info('Operation cancelled');
+        }
+    }
+
+    private function showLogStats(): void
+    {
+        $count = $this->logger->count();
+        $size = $this->logger->getFileSize();
+        
+        Output::section("Log Statistics");
+        Output::writeln("Total entries: {$count}");
+        Output::writeln("Log file size: {$size}");
+        Output::writeln("Log status: " . ($count > 0 ? "Active" : "Empty"));
+        
+        if ($count > 0) {
+            $entries = $this->logger->getEntries();
+            $firstEntry = reset($entries);
+            $lastEntry = end($entries);
+            
+            Output::writeln("First entry: {$firstEntry['timestamp']}");
+            Output::writeln("Last entry: {$lastEntry['timestamp']}");
+        }
+    }
+
+    private function menuHelp(): void
+    {
+        Output::section("Help");
+        Output::writeln("Welcome to Bahll — a cryptography toolkit.");
+        Output::writeln("");
+        Output::writeln("Quick Usage:");
+        Output::writeln("  - Enter the number shown to open that feature menu (e.g. 2 → Symmetric Encryption).");
+        Output::writeln("  - Type 'h' to show this help, 'i' for brief app info, 'q' to quit.");
+        Output::writeln("  - Type 'clear' to clear the terminal and re-display the banner.");
+        Output::writeln("");
+        Output::writeln("Menu Guide:");
+        Output::writeln("  1) Hashing & KDF — compute hashes, HMACs, and derive keys (PBKDF2/Argon2id).");
+        Output::writeln("  2) Symmetric Encryption — AES-GCM (authenticated) and AES-CBC+HMAC operations.");
+        Output::writeln("     - Use AES-GCM for most authenticated encrypt/decrypt of strings.");
+        Output::writeln("     - AES-CBC with HMAC is available for compatibility with legacy formats.");
+        Output::writeln("  3) Asymmetric Crypto — generate RSA/Ed25519 keys, sign and verify messages.");
+        Output::writeln("  4) Keyring — initialize an encrypted keyring, add/list/export keys securely.");
+        Output::writeln("  5) Encoding — convert data to Base64/URL-safe Base64/Hex.");
+        Output::writeln("  6) Randomness — generate cryptographically secure random bytes for keys/tokens.");
+        Output::writeln("  7) Audit — quick system check for required crypto extensions and recommended settings.");
+        Output::writeln("  8) Secret Lifecycle — helpers to generate passwords, API tokens, salts.");
+        Output::writeln("  9) Folder Encryption — encrypt/decrypt all files under storage/Data/ (preserves structure).");
+        Output::writeln(" 10) Activity Log — view/export/clear non-sensitive base64-encoded usage logs.");
+        Output::writeln("");
+        Output::writeln("Examples:");
+        Output::writeln("  - Encrypt a short message: Menu → 2 → 1 (enter plaintext, then optional password). Save the output.");
+        Output::writeln("  - Decrypt: Menu → 2 → 2 and paste the cipher blob, provide the password if used.");
+        Output::writeln("  - Encrypt a folder: Put files into storage/Data/, then Menu → 9 → 2 and provide a password.");
+        Output::writeln("");
+        Output::writeln("Security Notes:");
+        Output::writeln("  - Never share private keys or passphrases via the activity log or public channels.");
+        Output::writeln("  - Activity logs are sanitized and stored in base64 at storage/activity.log, but avoid logging secrets.");
+        Output::writeln("  - Use strong passwords or let the tool generate random keys for highest security.");
+        Output::writeln("");
+        Output::writeln("If you need step-by-step help for a specific menu, open that menu and look for prompts.");
+    }
+
+    private function menuInfo(): void
+    {
+        Output::section("Application Info");
+        Output::writeln("Version: 0.2.1");
+        Output::writeln("Author: Muh. Agus Tri Ananda");
     }
 }
