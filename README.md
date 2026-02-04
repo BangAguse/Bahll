@@ -257,4 +257,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-*Built with ❤️ for secure development workflows. Replace the demo GIF with a repository asset for offline viewing.*
+*Built with ❤️ for secure development workflows.*
