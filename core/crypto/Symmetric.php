@@ -30,10 +30,18 @@ class Symmetric
         $json = json_decode(base64_decode($blob), true);
         if (!$json) return false;
         if ($json['cipher'] !== 'aes-256-gcm') return false;
+        if (!isset($json['iv']) || !isset($json['tag']) || !isset($json['ct'])) return false;
+        
         $iv = hex2bin($json['iv']);
         $tag = hex2bin($json['tag']);
-        $key = $password ? hash('sha256', $password, true) : null;
-        if ($key === null) return false;
+        $keyed = $json['keyed'] ?? false;
+        
+        
+        if ($keyed && !$password) return false;
+        
+        if (!$keyed) return false;
+        
+        $key = hash('sha256', $password, true);
         $ct = base64_decode($json['ct']);
         $pt = openssl_decrypt($ct, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
         return $pt === false ? false : $pt;
@@ -54,15 +62,20 @@ class Symmetric
     {
         $json = json_decode(base64_decode($blob), true);
         if (!$json) return false;
+        if (!isset($json['iv']) || !isset($json['ct']) || !isset($json['mac'])) return false;
+        
         $key = hash('sha256', $password, true);
         $ct = base64_decode($json['ct']);
         $mac = hex2bin($json['mac']);
         $calc = hash_hmac('sha256', $ct, $key, true);
+        
         if (!Utils::constantTimeEquals($mac, $calc)) {
             fwrite(STDERR, "✖ Rejected by Bahll: Weak cryptographic configuration detected (MAC mismatch)\n");
             return false;
         }
+        
         $iv = hex2bin($json['iv']);
-        return openssl_decrypt($ct, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+        $pt = openssl_decrypt($ct, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+        return $pt === false ? false : $pt;
     }
 }
