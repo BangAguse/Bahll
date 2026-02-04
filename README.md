@@ -2,7 +2,7 @@
 <div align="center">
   <img src="docs/assets/bahll_banner.png" alt="Bahll Banner" width="600" />
 
-  <h1>Bahll Cryptography Suite</h1>
+  <h1>🔐 Bahll Cryptography Suite</h1>
   <p><em>Authority over your cryptography.</em></p>
 
   <!-- Badges -->
@@ -13,9 +13,9 @@
     <img alt="Security" src="https://img.shields.io/badge/security-fail--closed-red.svg" />
   </p>
 
-  <!-- GIF -->
+  <!-- Demo GIF -->
   <p>
-    <img src="https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyZDQ1bzFmYTYxcWdkcmh3aGIzYXRnd2MxejRuMnBmbjUzMnF6OTEwbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/077i6AULCXc0FKTj9s/giphy.gif" alt="Cryptography" width="600" />
+    <img src="docs/assets/demo.gif" alt="Bahll CLI Demo" width="600" />
   </p>
 
   <p>
@@ -72,6 +72,22 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 - List keys with metadata 📋
 - Enforce strong passphrase policies 🛡️
 
+### � **[NEW] Folder Encryption Manager**
+- 🔒 **Encrypt entire folder structures** with password protection
+- 📂 Recursive directory support with metadata preservation
+- 🔑 Secure key derivation (SHA-256)
+- 📊 Real-time encryption statistics and progress
+- 🗂️ Automatic folder structure creation
+- 📁 Decryption with output to separate directory
+
+### 📋 **[NEW] Activity Logging System**
+- 📝 **Complete audit trail** of all cryptographic operations
+- 🛡️ **Non-sensitive logging** - passwords/keys never recorded
+- 🔐 **Base64-encoded storage** for additional obfuscation
+- 🔍 **Smart sanitization** - removes hex strings, base64 blobs, tokens
+- 📊 Real-time statistics: entry count, file size, timestamps
+- 📤 **Export logs** for compliance and auditing purposes
+
 ### 📝 Encoding & Obfuscation
 - **Base64** (standard and URL-safe) 🔤
 - **Base32** and **Base58** 🔢
@@ -94,6 +110,7 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 - Mask and rotate secrets 🔄
 - Revoke keys and enforce expiration ⏰
 - Pre-commit hooks for security scans 🪝
+- **[NEW] Generate secure passwords, tokens, salts** instantly
 
 ### 🛠️ Dev & CI Utilities
 - Pre-commit security scanning 🪝
@@ -237,3 +254,7 @@ For bugs or features, open an issue. Follow PHP PSR-12 coding standards.
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+*Built with ❤️ for secure development workflows.*
