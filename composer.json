@@ -1,6 +1,7 @@
 {
     "name": "bahll/cryptotool",
-    "description": "Bahll Cryptography Suite - CLI",
+    "description": "Bahll Cryptography Suite - CLI v0.2.1",
+    "version": "0.2.1",
     "type": "project",
     "require": {
         "php": "^7.4 || ^8.0",
