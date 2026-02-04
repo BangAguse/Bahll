@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="docs/assets/bahll_banner.png" alt="Bahll Banner" width="600" />
 
@@ -11,6 +10,7 @@
     <img alt="Status" src="https://img.shields.io/badge/status-stable-green.svg" />
     <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
     <img alt="Security" src="https://img.shields.io/badge/security-fail--closed-red.svg" />
+    <img alt="Version" src="https://img.shields.io/badge/version-0.2.1-blue.svg" />
   </p>
 
   <!-- Demo GIF -->
@@ -257,4 +257,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-*Built with ❤️ for secure development workflows.*
+*Built with ❤️ for secure development workflows. Replace the demo GIF with a repository asset for offline viewing.*
