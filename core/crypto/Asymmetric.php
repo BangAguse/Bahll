@@ -24,9 +24,7 @@ class Asymmetric
         if (!function_exists('sodium_crypto_sign_keypair')) {
             return ['error' => 'libsodium not available'];
         }
-        $pair = sodium_crypto_sign_keypair();
-        $pk = sodium_crypto_sign_publickey($pair);
-        $sk = sodium_crypto_sign_secretkey($pair);
+        [$pk, $sk] = sodium_crypto_sign_keypair();
         return ['private_hex' => bin2hex($sk), 'public_hex' => bin2hex($pk)];
     }
 
