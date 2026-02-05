@@ -229,6 +229,18 @@ We welcome contributions! Here's how to get started:
 
 For bugs or features, open an issue. Follow PHP PSR-12 coding standards.
 
+## ☕ Support Me
+
+Jika proyek ini bermanfaat dan membantu pekerjaanmu, kamu bisa mendukung pengembangannya
+melalui donasi sebagai bentuk apresiasi terhadap karya open-source ini.
+
+<p align="center">
+  <img src="https://i.ibb.co.com/21mcgrL6/Untitled-design-20251229-042141-0000.png" alt="DANA Logo" width="140"><br>
+  <b>DANA:</b> 085756444803
+</p>
+
+Dukunganmu membantu proyek ini tetap hidup, terawat, dan terus dikembangkan 🚀
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
