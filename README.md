@@ -10,7 +10,7 @@
     <img alt="Status" src="https://img.shields.io/badge/status-stable-green.svg" />
     <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
     <img alt="Security" src="https://img.shields.io/badge/security-fail--closed-red.svg" />
-    <img alt="Version" src="https://img.shields.io/badge/version-0.2.1-blue.svg" />
+    <img alt="Version" src="https://img.shields.io/badge/version-0.3.0-blue.svg" />
   </p>
 
   <!-- Demo GIF -->
@@ -123,6 +123,28 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 - Safe module loading 🛡️
 - Folder-based plugin discovery 📁
 
+## Project Structure
+
+```
+Bahll/
+├─ bahll.php          # Main entry point
+├─ setup.php          # Environment setup script
+├─ composer.json      # PHP dependencies config
+├─ core/              # Core crypto modules
+│  ├─ crypto/         # Hash, Symmetric, Asymmetric
+│  ├─ keyring/        # Encrypted key storage
+├─ cli/               # CLI interface
+│  ├─ menu/           # Interactive menus
+│  ├─ input/          # Input handling
+│  ├─ output/         # Output rendering
+├─ utils/             # Utilities (e.g., constant-time compare)
+├─ storage/           # Encrypted data storage
+├─ plugins/           # Extensible plugins
+├─ tests/             # Unit tests
+├─ docs/assets/       # Documentation assets
+└─ README.md          # This file
+```
+
 ## Architecture
 
 Bahll follows a **modular, CLI-first architecture**:
@@ -229,22 +251,10 @@ We welcome contributions! Here's how to get started:
 
 For bugs or features, open an issue. Follow PHP PSR-12 coding standards.
 
-## ☕ Support Me
-
-Jika proyek ini bermanfaat dan membantu pekerjaanmu, kamu bisa mendukung pengembangannya
-melalui donasi sebagai bentuk apresiasi terhadap karya open-source ini.
-
-<p align="center">
-  <img src="https://i.ibb.co.com/21mcgrL6/Untitled-design-20251229-042141-0000.png" alt="DANA Logo" width="140"><br>
-  <b>DANA:</b> 085756444803
-</p>
-
-Dukunganmu membantu proyek ini tetap hidup, terawat, dan terus dikembangkan 🚀
-
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-*Built with ❤️ for secure development workflows.*
+*Built with ❤️ for secure development workflows. Replace the demo GIF with a repository asset for offline viewing.*
