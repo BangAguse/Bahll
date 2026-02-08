@@ -4,6 +4,38 @@ All notable changes to the Bahll project will be documented in this file.
 
 ---
 
+## [0.3.0] - 2026-02-08
+
+### ✨ **NEW FEATURES**
+
+- **Decryptor Manager** - New menu (10) for advanced decryption operations
+  - View encrypted files in `storage/Data_decrypt`
+  - Wordlist-based brute-force password cracking (~500 common passwords)
+  - Single password decryption for bulk files
+  - View decrypted outputs in `storage/Decrypted`
+- **Keyring Key Removal** - Added ability to delete keys from encrypted keyring storage
+- **Storage Layout Restructuring** - New directories for organized encryption workflow:
+  - `storage/Data_encrypt` - Input files for encryption
+  - `storage/Data_decrypt` - Encrypted files to decrypt
+  - `storage/Decrypted` - Output of successful decryption
+  - `storage/Encrypted` - Output of encryption process
+
+### 🔧 **IMPROVEMENTS**
+
+- Enhanced Help menu with detailed module descriptions and examples
+- Improved menu text clarity (removed repetitive descriptions)
+- Fixed Keyring salt handling for correct libsodium compliance
+- AEAD nonce separation from password hashing salt
+
+### 🐛 **BUG FIXES**
+
+- Fixed `sodium_crypto_pwhash` salt length validation
+- Fixed XChaCha20-Poly1305 nonce handling in Keyring
+- Fixed Audit menu infinite loop
+- Fixed Help and Info menus looping behavior
+
+---
+
 ## [0.2.1] - 2026-02-05
 
 ### 🔴 **CRITICAL BUG FIXES**
