@@ -9,6 +9,8 @@ class FolderEncrypt
 {
     private string $dataDir;
     private string $encryptedDir;
+    private string $dataDecryptDir;
+    private string $decryptedDir;
 
     public function __construct()
     {
@@ -17,14 +19,22 @@ class FolderEncrypt
             @mkdir($base, 0700, true);
         }
 
-        $this->dataDir = $base . '/Data';
+        $this->dataDir = $base . '/Data_encrypt';
+        $this->dataDecryptDir = $base . '/Data_decrypt';
         $this->encryptedDir = $base . '/Encrypted';
+        $this->decryptedDir = $base . '/Decrypted';
 
         if (!is_dir($this->dataDir)) {
             @mkdir($this->dataDir, 0700, true);
         }
+        if (!is_dir($this->dataDecryptDir)) {
+            @mkdir($this->dataDecryptDir, 0700, true);
+        }
         if (!is_dir($this->encryptedDir)) {
             @mkdir($this->encryptedDir, 0700, true);
+        }
+        if (!is_dir($this->decryptedDir)) {
+            @mkdir($this->decryptedDir, 0700, true);
         }
     }
 
@@ -32,6 +42,16 @@ class FolderEncrypt
     public function getDataDir(): string
     {
         return $this->dataDir;
+    }
+
+    public function getDataDecryptDir(): string
+    {
+        return $this->dataDecryptDir;
+    }
+
+    public function getDecryptedDir(): string
+    {
+        return $this->decryptedDir;
     }
 
     
@@ -146,7 +166,7 @@ class FolderEncrypt
                 RecursiveIteratorIterator::SELF_FIRST
             );
 
-            $decryptDir = $this->dataDir . '_decrypted';
+            $decryptDir = $this->decryptedDir;
             if (!is_dir($decryptDir)) {
                 @mkdir($decryptDir, 0700, true);
             }
@@ -163,6 +183,88 @@ class FolderEncrypt
                         $results['failed']++;
                         $results['errors'][] = 'Failed to decrypt: ' . $relativePath;
                     }
+                }
+            }
+        } catch (\Exception $e) {
+            $results['errors'][] = 'Exception: ' . $e->getMessage();
+        }
+
+        return $results;
+    }
+
+    
+    public function decryptDataDecryptAll(string $password): array
+    {
+        $results = [
+            'success' => 0,
+            'failed' => 0,
+            'errors' => [],
+            'decrypted_files' => []
+        ];
+
+        if (!is_dir($this->dataDecryptDir) || count(glob($this->dataDecryptDir . '/*')) === 0) {
+            $results['errors'][] = 'Data_decrypt directory is empty';
+            return $results;
+        }
+
+        try {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($this->dataDecryptDir, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            $outDir = $this->decryptedDir;
+            if (!is_dir($outDir)) {
+                @mkdir($outDir, 0700, true);
+            }
+
+            foreach ($iterator as $item) {
+                if ($item->isFile()) {
+                    $relativePath = str_replace($this->dataDecryptDir . DIRECTORY_SEPARATOR, '', $item->getPathname());
+                    $outPath = $outDir . DIRECTORY_SEPARATOR . $relativePath;
+
+                    $content = file_get_contents($item->getPathname());
+                    if ($content === false) {
+                        $results['failed']++;
+                        $results['errors'][] = 'Failed to read: ' . $relativePath;
+                        continue;
+                    }
+
+                    
+                    $content = trim($content);
+
+                    
+                    $decrypted = Symmetric::decryptAesCbcWithHmac($content, $password);
+                    if ($decrypted === false) {
+                        $decrypted = Symmetric::decryptAesGcm($content, $password);
+                    }
+
+                    if ($decrypted === false) {
+                        $results['failed']++;
+                        $results['errors'][] = 'Failed to decrypt: ' . $relativePath;
+                        continue;
+                    }
+
+                    
+                    if (substr($outPath, -4) === '.enc') {
+                        $outPath = substr($outPath, 0, -4);
+                    }
+
+                    $dir = dirname($outPath);
+                    if (!is_dir($dir)) {
+                        @mkdir($dir, 0700, true);
+                    }
+
+                    $w = file_put_contents($outPath, $decrypted);
+                    if ($w === false) {
+                        $results['failed']++;
+                        $results['errors'][] = 'Failed to write: ' . $relativePath;
+                        continue;
+                    }
+
+                    @chmod($outPath, 0600);
+                    $results['success']++;
+                    $results['decrypted_files'][] = $relativePath;
                 }
             }
         } catch (\Exception $e) {
