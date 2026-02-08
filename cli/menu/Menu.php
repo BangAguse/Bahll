@@ -7,6 +7,7 @@ use Bahll\Core\Crypto\Hash;
 use Bahll\Core\Crypto\Symmetric;
 use Bahll\Core\Crypto\Asymmetric;
 use Bahll\Core\Crypto\FolderEncrypt;
+use Bahll\Core\Crypto\Bruteforce;
 use Bahll\Core\Keyring\Keyring;
 use Bahll\Core\Logging\ActivityLogger;
 
@@ -37,9 +38,10 @@ class Menu
             Output::writeln("6) Randomness & Entropy");
             Output::writeln("7) Audit & Validation");
             Output::writeln("8) Secret Lifecycle");
-            Output::writeln("9) Folder Encryption");
-            Output::writeln("10) Activity Log");
-            Output::writeln("11) Dev & CI Utilities");
+            Output::writeln("9) Encryptor Manager");
+            Output::writeln("10) Decryptor Manager");
+            Output::writeln("11) Activity Log");
+            Output::writeln("12) Dev & CI Utilities");
             Output::writeln("h) Help");
             Output::writeln("i) Info");
             Output::writeln("q) Exit");
@@ -73,12 +75,15 @@ class Menu
                     $this->menuSecrets();
                     break;
                 case '9':
-                    $this->menuFolderEncrypt();
+                    $this->menuEncryptor();
                     break;
                 case '10':
-                    $this->menuActivityLog();
+                    $this->menuDecryptorManager();
                     break;
                 case '11':
+                    $this->menuActivityLog();
+                    break;
+                case '12':
                     Output::writeln("Dev & CI utilities are available in the CLI.");
                     break;
                 case 'h':
@@ -132,22 +137,24 @@ class Menu
 
     private function menuHash(): void
     {
-        Output::section("Hashing & KDF Menu");
-        Output::writeln("1) SHA-1 (deprecated)");
-        Output::writeln("2) SHA-256");
-        Output::writeln("3) SHA-512");
-        Output::writeln("4) SHA3-512");
-        Output::writeln("5) BLAKE2");
-        Output::writeln("6) BLAKE3 (if supported)");
-        Output::writeln("7) HMAC");
-        Output::writeln("8) PBKDF2");
-        Output::writeln("9) bcrypt");
-        Output::writeln("10) scrypt");
-        Output::writeln("11) Argon2id");
-        Output::writeln("0) Back");
+        while (true) {
+            Output::section("Hashing & KDF Menu");
+            Output::writeln("1) SHA-1");
+            Output::writeln("2) SHA-256");
+            Output::writeln("3) SHA-512");
+            Output::writeln("4) SHA3-512");
+            Output::writeln("5) BLAKE2");
+            Output::writeln("6) BLAKE3");
+            Output::writeln("7) HMAC");
+            Output::writeln("8) PBKDF2");
+            Output::writeln("9) bcrypt");
+            Output::writeln("10) scrypt");
+            Output::writeln("11) Argon2id");
+            Output::writeln("0) Back");
 
-        $c = Input::prompt('Choice');
-        switch ($c) {
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
             case '1':
                 $d = Input::prompt('Data to hash');
                 $hash = Hash::sha1($d);
@@ -227,21 +234,25 @@ class Menu
                 }
                 break;
             default:
-                return;
+                Output::info('Returning to menu selection');
+                break;
+            }
         }
     }
 
     private function menuSymmetric(): void
     {
-        Output::section("Symmetric Encryption");
-        Output::writeln("1) AES-256-GCM encrypt string");
-        Output::writeln("2) AES-256-GCM decrypt string");
-        Output::writeln("3) AES-256-CBC with HMAC encrypt");
-        Output::writeln("4) AES-256-CBC with HMAC decrypt");
-        Output::writeln("0) Back");
+        while (true) {
+            Output::section("Symmetric Encryption");
+            Output::writeln("1) AES-256-GCM encrypt string");
+            Output::writeln("2) AES-256-GCM decrypt string");
+            Output::writeln("3) AES-256-CBC with HMAC encrypt");
+            Output::writeln("4) AES-256-CBC with HMAC decrypt");
+            Output::writeln("0) Back");
 
-        $c = Input::prompt('Choice');
-        switch ($c) {
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
             case '1':
                 $pt = Input::prompt('Plaintext');
                 $pw = Input::prompt('Password (leave blank to use random key)');
@@ -275,20 +286,24 @@ class Menu
                 }
                 break;
             default:
-                return;
+                Output::info('Returning to menu selection');
+                break;
+            }
         }
     }
 
     private function menuAsymmetric(): void
     {
-        Output::section("Asymmetric Crypto");
-        Output::writeln("1) Generate RSA keypair");
-        Output::writeln("2) Generate Ed25519 keypair");
-        Output::writeln("3) Sign/Verify using Ed25519");
-        Output::writeln("0) Back");
+        while (true) {
+            Output::section("Asymmetric Crypto");
+            Output::writeln("1) Generate RSA keypair");
+            Output::writeln("2) Generate Ed25519 keypair");
+            Output::writeln("3) Sign/Verify using Ed25519");
+            Output::writeln("0) Back");
 
-        $c = Input::prompt('Choice');
-        switch ($c) {
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
             case '1':
                 $bits = (int)Input::prompt('Key size (2048/3072/4096)');
                 $p = Input::prompt('Passphrase (optional)');
@@ -342,21 +357,26 @@ class Menu
                 }
                 break;
             default:
-                return;
+                Output::info('Returning to menu selection');
+                break;
+            }
         }
     }
 
     private function menuKeyring(Keyring $k): void
     {
-        Output::section("Keyring Management");
-        Output::writeln("1) Initialize keyring");
-        Output::writeln("2) Add key");
-        Output::writeln("3) List keys");
-        Output::writeln("4) Export key");
-        Output::writeln("0) Back");
+        while (true) {
+            Output::section("Keyring Management");
+            Output::writeln("1) Initialize keyring");
+            Output::writeln("2) Add key");
+            Output::writeln("3) List keys");
+            Output::writeln("4) Export key");
+            Output::writeln("5) Remove key");
+            Output::writeln("0) Back");
 
-        $c = Input::prompt('Choice');
-        switch ($c) {
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
             case '1':
                 $pw = Input::prompt('Set passphrase for keyring');
                 if ($k->init($pw)) {
@@ -404,87 +424,123 @@ class Menu
                     $this->logger->log("Export key - {$alias}", 'success');
                 }
                 break;
+            case '5':
+                $alias = Input::prompt('Alias');
+                $pw = Input::prompt('Keyring passphrase');
+                if ($k->removeKey($alias, $pw)) {
+                    Output::success("Key removed: {$alias}");
+                    $this->logger->log("Remove key - {$alias}", 'success');
+                } else {
+                    Output::error('Not found or bad passphrase');
+                    $this->logger->log("Remove key - {$alias}", 'failed');
+                }
+                break;
             default:
-                return;
+                Output::info('Returning to menu selection');
+                break;
+            }
         }
     }
 
     private function menuEncoding(): void
     {
-        Output::section("Encoding / Obfuscation");
-        $d = Input::prompt('Data to encode');
-        if ($d === null) return;
-        
-        $b64 = base64_encode($d);
-        $b64url = rtrim(strtr($b64, '+/', '-_'), '=');
-        $hex = bin2hex($d);
-        
-        Output::writeln('');
-        Output::result('Base64', $b64);
-        Output::result('URL-safe Base64', $b64url);
-        Output::result('Hexadecimal', $hex);
-        
-        $this->logger->log('Encode data', 'success', 'Multiple formats');
+        while (true) {
+            Output::section("Encoding / Obfuscation");
+            Output::writeln("1) Encode data (Base64/URL-safe/Hex)");
+            Output::writeln("0) Back");
+
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+
+            if ($c === '1') {
+                $d = Input::prompt('Data to encode');
+                if ($d === null) continue;
+                $b64 = base64_encode($d);
+                $b64url = rtrim(strtr($b64, '+/', '-_'), '=');
+                $hex = bin2hex($d);
+
+                Output::writeln('');
+                Output::result('Base64', $b64);
+                Output::result('URL-safe Base64', $b64url);
+                Output::result('Hexadecimal', $hex);
+
+                $this->logger->log('Encode data', 'success', 'Multiple formats');
+            } else {
+                Output::info('Unknown selection');
+            }
+        }
     }
 
     private function menuRandom(): void
     {
-        Output::section("CSPRNG - Randomness Generator");
-        $n = (int)Input::prompt('Bytes to generate (default 32)');
-        $n = $n > 0 ? $n : 32;
-        
-        if ($n > 10000) {
-            Output::warning("Large size requested ({$n} bytes), this may be slow");
+        while (true) {
+            Output::section("CSPRNG - Randomness Generator");
+            Output::writeln("1) Generate random bytes");
+            Output::writeln("0) Back");
+
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+
+            if ($c === '1') {
+                $n = (int)Input::prompt('Bytes to generate (default 32)');
+                $n = $n > 0 ? $n : 32;
+
+                if ($n > 10000) {
+                    Output::warning("Large size requested ({$n} bytes), this may be slow");
+                }
+
+                $tok = random_bytes($n);
+                $hex = bin2hex($tok);
+                $b64 = base64_encode($tok);
+
+                Output::writeln('');
+                Output::result("Random Bytes (Hex) [{$n} bytes]", $hex);
+                Output::result("Random Bytes (Base64)", $b64);
+
+                $this->logger->log('Generate random bytes', 'success', "{$n} bytes");
+            } else {
+                Output::info('Unknown selection');
+            }
         }
-        
-        $tok = random_bytes($n);
-        $hex = bin2hex($tok);
-        $b64 = base64_encode($tok);
-        
-        Output::writeln('');
-        Output::result("Random Bytes (Hex) [{$n} bytes]", $hex);
-        Output::result("Random Bytes (Base64)", $b64);
-        
-        $this->logger->log('Generate random bytes', 'success', "{$n} bytes");
     }
 
     private function menuAudit(): void
     {
         Output::section("Security Audit & System Check");
-        
+
         Output::writeln("");
         Output::writeln("Extensions:");
         Output::writeln("  OpenSSL: " . (extension_loaded('openssl') ? "✓ available" : "✗ missing"));
         Output::writeln("  Sodium: " . (extension_loaded('sodium') ? "✓ available" : "✗ missing"));
-        
+
         Output::writeln("\nCipher Support:");
         $ciphers = ['aes-256-gcm', 'aes-256-cbc', 'chacha20-poly1305'];
         foreach ($ciphers as $c) {
             $avail = in_array($c, openssl_get_cipher_methods() ?? []);
             Output::writeln("  {$c}: " . ($avail ? "✓ available" : "✗ missing"));
         }
-        
+
         Output::writeln("\nHash Algorithms:");
         $hashes = ['sha256', 'sha512', 'sha3-512', 'blake2b512'];
         foreach ($hashes as $h) {
             $avail = in_array($h, hash_algos());
             Output::writeln("  {$h}: " . ($avail ? "✓ available" : "✗ missing"));
         }
-        
+
         Output::writeln("\nPassword Hashing:");
         Output::writeln("  bcrypt: " . (CRYPT_BLOWFISH ? "✓ available" : "✗ missing"));
         Output::writeln("  Argon2id: " . (defined('PASSWORD_ARGON2ID') ? "✓ available" : "✗ missing"));
-        
+
         Output::writeln("\n");
         $score = $this->calculateSecurityScore();
         Output::highlight("Security Score: {$score}");
-        
+
         Output::writeln("\nRecommendations:");
         Output::writeln("  • Avoid SHA-1, MD5 - use SHA-256 or better");
         Output::writeln("  • Prefer AEAD ciphers (GCM, Poly1305, ChaCha20)");
         Output::writeln("  • Use RSA >= 2048 bits (4096 preferred)");
         Output::writeln("  • Use Argon2id for password hashing");
-        
+
         $this->logger->log('Audit system', 'success');
     }
 
@@ -528,63 +584,67 @@ class Menu
 
     private function menuSecrets(): void
     {
-        Output::section("Secret Lifecycle Management");
-        Output::writeln("1) Generate secure password");
-        Output::writeln("2) Generate API token");
-        Output::writeln("3) Generate cryptographic salt");
-        Output::writeln("0) Back");
-        
-        $c = Input::prompt('Choice');
-        switch ($c) {
-            case '1':
-                $pwd = bin2hex(random_bytes(16));
-                Output::result('Secure Password', $pwd);
-                $this->logger->log('Generate secure password', 'success');
-                break;
-            case '2':
-                $token = base64_encode(random_bytes(32));
-                Output::result('API Token', $token);
-                $this->logger->log('Generate API token', 'success');
-                break;
-            case '3':
-                $salt = bin2hex(random_bytes(16));
-                Output::result('Cryptographic Salt', $salt);
-                $this->logger->log('Generate salt', 'success');
-                break;
-            default:
-                return;
+        while (true) {
+            Output::section("Secret Lifecycle Management");
+            Output::writeln("1) Generate secure password");
+            Output::writeln("2) Generate API token");
+            Output::writeln("3) Generate cryptographic salt");
+            Output::writeln("0) Back");
+
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
+                case '1':
+                    $pwd = bin2hex(random_bytes(16));
+                    Output::result('Secure Password', $pwd);
+                    $this->logger->log('Generate secure password', 'success');
+                    break;
+                case '2':
+                    $token = base64_encode(random_bytes(32));
+                    Output::result('API Token', $token);
+                    $this->logger->log('Generate API token', 'success');
+                    break;
+                case '3':
+                    $salt = bin2hex(random_bytes(16));
+                    Output::result('Cryptographic Salt', $salt);
+                    $this->logger->log('Generate salt', 'success');
+                    break;
+                default:
+                    Output::info('Returning to menu selection');
+                    break;
+            }
         }
     }
 
-    private function menuFolderEncrypt(): void
+    private function menuEncryptor(): void
     {
-        Output::section("Folder Encryption Manager");
-        Output::writeln("1) View Data folder contents");
-        Output::writeln("2) Encrypt all files in Data folder");
-        Output::writeln("3) View Encrypted folder contents");
-        Output::writeln("4) Decrypt all encrypted files");
-        Output::writeln("5) Folder statistics");
-        Output::writeln("0) Back");
+        while (true) {
+            Output::section("Encryptor");
+            Output::writeln("1) View Data_encrypt folder contents");
+            Output::writeln("2) Encrypt all files in Data_encrypt folder");
+            Output::writeln("3) View Encrypted folder contents");
+            Output::writeln("4) Folder statistics");
+            Output::writeln("0) Back");
 
-        $c = Input::prompt('Choice');
-        switch ($c) {
-            case '1':
-                $this->viewFolderContents('data');
-                break;
-            case '2':
-                $this->performFolderEncryption();
-                break;
-            case '3':
-                $this->viewFolderContents('encrypted');
-                break;
-            case '4':
-                $this->performFolderDecryption();
-                break;
-            case '5':
-                $this->viewFolderStats();
-                break;
-            default:
-                return;
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
+                case '1':
+                    $this->viewFolderContents('data');
+                    break;
+                case '2':
+                    $this->performFolderEncryption();
+                    break;
+                case '3':
+                    $this->viewFolderContents('encrypted');
+                    break;
+                case '4':
+                    $this->viewFolderStats();
+                    break;
+                default:
+                    Output::info('Returning to menu selection');
+                    break;
+            }
         }
     }
 
@@ -672,8 +732,130 @@ class Menu
             }
         }
 
-        Output::info("Decrypted files saved to: {$this->folderEncrypt->getDataDir()}_decrypted");
+        Output::info("Decrypted files saved to: {$this->folderEncrypt->getDecryptedDir()}");
         $this->logger->logFolderDecryption($this->folderEncrypt->getEncryptedDir(), $results['success'], $results['failed'] === 0);
+    }
+
+    private function menuDecryptorManager(): void
+    {
+        while (true) {
+            Output::section("Decryptor Manager");
+            Output::writeln("1) View Data_decrypt folder contents");
+            Output::writeln("2) Bruteforce");
+            Output::writeln("3) Decrypt all files in Data_decrypt");
+            Output::writeln("4) View Decrypted folder contents");
+            Output::writeln("0) Back");
+
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
+                case '1':
+                    $this->viewDataDecryptContents();
+                    break;
+                case '2':
+                    $this->performBruteforce();
+                    break;
+                case '3':
+                    $pw = Input::prompt('Enter password to use for decrypting Data_decrypt files');
+                    if (trim($pw) === '') {
+                        Output::warning('Empty password, aborting');
+                        break;
+                    }
+                    $res = $this->folderEncrypt->decryptDataDecryptAll($pw);
+                    Output::section('Decryption Results');
+                    Output::success('Successfully decrypted: ' . $res['success'] . ' file(s)');
+                    if ($res['failed'] > 0) {
+                        Output::error('Failed to decrypt: ' . $res['failed'] . ' file(s)');
+                    }
+                    if (!empty($res['errors'])) {
+                        Output::warning('Errors encountered:');
+                        foreach ($res['errors'] as $err) {
+                            Output::writeln('  - ' . $err);
+                        }
+                    }
+                    $this->logger->log('Decrypt Data_decrypt', 'completed');
+                    break;
+                case '4':
+                    $this->viewDecryptedContents();
+                    break;
+                default:
+                    Output::info('Returning to menu selection');
+                    break;
+            }
+        }
+    }
+
+    private function performBruteforce(): void
+    {
+        Output::section("Bruteforce - Data_decrypt");
+        $wl = __DIR__ . '/../../storage/wordlist.txt';
+        Output::writeln("Using wordlist: storage/wordlist.txt");
+
+        $bf = new Bruteforce();
+        $results = $bf->attackDataDecrypt($wl);
+
+        if (empty($results)) {
+            Output::info('No passwords found or no files to test');
+        } else {
+            Output::section('Bruteforce Results');
+            foreach ($results as $file => $r) {
+                Output::writeln("  - {$file} => found after {$r['attempts']} attempts");
+            }
+        }
+
+        $this->logger->log('Bruteforce attack', 'completed');
+    }
+
+    private function viewDataDecryptContents(): void
+    {
+        Output::section("Data_decrypt Folder Contents");
+        $files = $this->folderEncrypt->getDataDecryptDir();
+        Output::writeln("Location: {$files}\n");
+
+        $list = [];
+        if (is_dir($files)) {
+            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($files, \RecursiveDirectoryIterator::SKIP_DOTS));
+            foreach ($it as $f) {
+                if ($f->isFile()) {
+                    $list[] = $f->getPathname();
+                }
+            }
+        }
+
+        if (empty($list)) {
+            Output::info('Folder is empty');
+            return;
+        }
+
+        foreach ($list as $f) {
+            Output::writeln('  ' . $f);
+        }
+    }
+
+    private function viewDecryptedContents(): void
+    {
+        Output::section("Decrypted Folder Contents");
+        $dir = $this->folderEncrypt->getDecryptedDir();
+        Output::writeln("Location: {$dir}\n");
+
+        $list = [];
+        if (is_dir($dir)) {
+            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS));
+            foreach ($it as $f) {
+                if ($f->isFile()) {
+                    $list[] = $f->getPathname();
+                }
+            }
+        }
+
+        if (empty($list)) {
+            Output::info('Folder is empty');
+            return;
+        }
+
+        foreach ($list as $f) {
+            Output::writeln('  ' . $f);
+        }
     }
 
     private function viewFolderStats(): void
@@ -704,33 +886,37 @@ class Menu
 
     private function menuActivityLog(): void
     {
-        Output::section("Activity Log Management");
-        Output::writeln("1) View recent logs (last 20)");
-        Output::writeln("2) View all logs");
-        Output::writeln("3) Export log as base64");
-        Output::writeln("4) Clear logs");
-        Output::writeln("5) Log statistics");
-        Output::writeln("0) Back");
+        while (true) {
+            Output::section("Activity Log Management");
+            Output::writeln("1) View recent logs (last 20)");
+            Output::writeln("2) View all logs");
+            Output::writeln("3) Export log as base64");
+            Output::writeln("4) Clear logs");
+            Output::writeln("5) Log statistics");
+            Output::writeln("0) Back");
 
-        $c = Input::prompt('Choice');
-        switch ($c) {
-            case '1':
-                $this->displayRecentLogs(20);
-                break;
-            case '2':
-                $this->displayAllLogs();
-                break;
-            case '3':
-                $this->exportLogs();
-                break;
-            case '4':
-                $this->clearLogs();
-                break;
-            case '5':
-                $this->showLogStats();
-                break;
-            default:
-                return;
+            $c = Input::prompt('Choice');
+            if (trim($c) === '0') return;
+            switch ($c) {
+                case '1':
+                    $this->displayRecentLogs(20);
+                    break;
+                case '2':
+                    $this->displayAllLogs();
+                    break;
+                case '3':
+                    $this->exportLogs();
+                    break;
+                case '4':
+                    $this->clearLogs();
+                    break;
+                case '5':
+                    $this->showLogStats();
+                    break;
+                default:
+                    Output::info('Returning to menu selection');
+                    break;
+            }
         }
     }
 
@@ -806,63 +992,108 @@ class Menu
     {
         $count = $this->logger->count();
         $size = $this->logger->getFileSize();
-        
+
         Output::section("Log Statistics");
         Output::writeln("Total entries: {$count}");
         Output::writeln("Log file size: {$size}");
         Output::writeln("Log status: " . ($count > 0 ? "Active" : "Empty"));
-        
+
         if ($count > 0) {
             $entries = $this->logger->getEntries();
             $firstEntry = reset($entries);
             $lastEntry = end($entries);
-            
+
             Output::writeln("First entry: {$firstEntry['timestamp']}");
             Output::writeln("Last entry: {$lastEntry['timestamp']}");
         }
     }
 
-    private function menuHelp(): void
-    {
-        Output::section("Help");
-        Output::writeln("Welcome to Bahll — a cryptography toolkit.");
-        Output::writeln("");
-        Output::writeln("Quick Usage:");
-        Output::writeln("  - Enter the number shown to open that feature menu (e.g. 2 → Symmetric Encryption).");
-        Output::writeln("  - Type 'h' to show this help, 'i' for brief app info, 'q' to quit.");
-        Output::writeln("  - Type 'clear' to clear the terminal and re-display the banner.");
-        Output::writeln("");
-        Output::writeln("Menu Guide:");
-        Output::writeln("  1) Hashing & KDF — compute hashes, HMACs, and derive keys (PBKDF2/Argon2id).");
-        Output::writeln("  2) Symmetric Encryption — AES-GCM (authenticated) and AES-CBC+HMAC operations.");
-        Output::writeln("     - Use AES-GCM for most authenticated encrypt/decrypt of strings.");
-        Output::writeln("     - AES-CBC with HMAC is available for compatibility with legacy formats.");
-        Output::writeln("  3) Asymmetric Crypto — generate RSA/Ed25519 keys, sign and verify messages.");
-        Output::writeln("  4) Keyring — initialize an encrypted keyring, add/list/export keys securely.");
-        Output::writeln("  5) Encoding — convert data to Base64/URL-safe Base64/Hex.");
-        Output::writeln("  6) Randomness — generate cryptographically secure random bytes for keys/tokens.");
-        Output::writeln("  7) Audit — quick system check for required crypto extensions and recommended settings.");
-        Output::writeln("  8) Secret Lifecycle — helpers to generate passwords, API tokens, salts.");
-        Output::writeln("  9) Folder Encryption — encrypt/decrypt all files under storage/Data/ (preserves structure).");
-        Output::writeln(" 10) Activity Log — view/export/clear non-sensitive base64-encoded usage logs.");
-        Output::writeln("");
-        Output::writeln("Examples:");
-        Output::writeln("  - Encrypt a short message: Menu → 2 → 1 (enter plaintext, then optional password). Save the output.");
-        Output::writeln("  - Decrypt: Menu → 2 → 2 and paste the cipher blob, provide the password if used.");
-        Output::writeln("  - Encrypt a folder: Put files into storage/Data/, then Menu → 9 → 2 and provide a password.");
-        Output::writeln("");
-        Output::writeln("Security Notes:");
-        Output::writeln("  - Never share private keys or passphrases via the activity log or public channels.");
-        Output::writeln("  - Activity logs are sanitized and stored in base64 at storage/activity.log, but avoid logging secrets.");
-        Output::writeln("  - Use strong passwords or let the tool generate random keys for highest security.");
-        Output::writeln("");
-        Output::writeln("If you need step-by-step help for a specific menu, open that menu and look for prompts.");
-    }
-
     private function menuInfo(): void
     {
         Output::section("Application Info");
-        Output::writeln("Version: 0.2.1");
+        Output::writeln("Version: 0.3.0");
         Output::writeln("Author: Muh. Agus Tri Ananda");
+    }
+
+    private function menuHelp(): void
+    {
+        Output::section("Help & Documentation");
+        Output::writeln("Bahll - Educational Cryptography Toolkit v0.3.0");
+        Output::writeln("");
+        Output::writeln("━━━ CORE MODULES ━━━");
+        Output::writeln("");
+        Output::writeln("  1) HASHING & KEY DERIVATION");
+        Output::writeln("     Cryptographic hash functions (SHA-1, SHA-256, SHA-512, SHA3-512)");
+        Output::writeln("     BLAKE2/BLAKE3 support, HMAC, PBKDF2, bcrypt, scrypt, Argon2id");
+        Output::writeln("");
+        Output::writeln("  2) SYMMETRIC ENCRYPTION");
+        Output::writeln("     AES-256-GCM (AEAD, authenticated encryption)");
+        Output::writeln("     AES-256-CBC with HMAC for authenticated encryption");
+        Output::writeln("     ChaCha20-Poly1305 support (libsodium)");
+        Output::writeln("");
+        Output::writeln("  3) ASYMMETRIC CRYPTOGRAPHY");
+        Output::writeln("     RSA keypair generation (2048, 3072, 4096 bit)");
+        Output::writeln("     Ed25519 signatures (modern elliptic curve)");
+        Output::writeln("     Sign/verify operations with base64 output");
+        Output::writeln("");
+        Output::writeln("  4) KEYRING MANAGEMENT");
+        Output::writeln("     Encrypted key storage with XChaCha20-Poly1305");
+        Output::writeln("     Initialize, add, list, export, and remove keys");
+        Output::writeln("     Passphrase-protected access control");
+        Output::writeln("");
+        Output::writeln("  5) ENCODING & OBFUSCATION");
+        Output::writeln("     Base64 encoding (standard and URL-safe)");
+        Output::writeln("     Hexadecimal encoding/decoding");
+        Output::writeln("");
+        Output::writeln("  6) RANDOMNESS & ENTROPY");
+        Output::writeln("     Cryptographically Secure Pseudo-Random Number Generator (CSPRNG)");
+        Output::writeln("     Generate random bytes in configurable sizes");
+        Output::writeln("");
+        Output::writeln("  7) SECURITY AUDIT");
+        Output::writeln("     System capability assessment");
+        Output::writeln("     Cipher support detection, hash algorithm availability");
+        Output::writeln("     Security score calculation and recommendations");
+        Output::writeln("");
+        Output::writeln("  8) SECRET LIFECYCLE");
+        Output::writeln("     Generate secure passwords, API tokens, and cryptographic salts");
+        Output::writeln("");
+        Output::writeln("  9) ENCRYPTOR MANAGER");
+        Output::writeln("     Batch encrypt files/folders recursively");
+        Output::writeln("     Preserves directory structure with .enc suffix");
+        Output::writeln("");
+        Output::writeln("  10) DECRYPTOR MANAGER");
+        Output::writeln("      Password-based decryption with single password");
+        Output::writeln("      Wordlist-based brute-force attack (~500 common passwords)");
+        Output::writeln("      Automatic password discovery and bulk decryption");
+        Output::writeln("");
+        Output::writeln("  11) ACTIVITY LOG");
+        Output::writeln("      Real-time security event tracking");
+        Output::writeln("      Export logs, view statistics, audit trails");
+        Output::writeln("");
+        Output::writeln("━━━ QUICK REFERENCE ━━━");
+        Output::writeln("");
+        Output::writeln("  h) Help - Show this detailed help message");
+        Output::writeln("  i) Info - Show version and author information");
+        Output::writeln("  q) Exit - Quit Bahll");
+        Output::writeln("");
+        Output::writeln("━━━ NAVIGATION TIPS ━━━");
+        Output::writeln("");
+        Output::writeln("  • Type 0 (Back) in any submenu to return to main menu");
+        Output::writeln("  • Type 'clear' to clear terminal screen");
+        Output::writeln("  • All cryptographic operations are logged for audit trails");
+        Output::writeln("  • Passwords are never stored; only hashes are kept");
+        Output::writeln("");
+        Output::writeln("━━━ EXAMPLES ━━━");
+        Output::writeln("");
+        Output::writeln("  Hash a message with SHA-256:");
+        Output::writeln("    [1] → [2] → enter message → get SHA-256 hash");
+        Output::writeln("");
+        Output::writeln("  Encrypt a file with password:");
+        Output::writeln("    [9] → place file in storage/Data_encrypt → [2] → enter password");
+        Output::writeln("");
+        Output::writeln("  Brute-force decrypt a file:");
+        Output::writeln("    [10] → place encrypted file in storage/Data_decrypt → [2] (Bruteforce)");
+        Output::writeln("");
+        Output::writeln("For more information, visit: https://github.com/yourusername/bahll");
     }
 }
