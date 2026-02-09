@@ -72,7 +72,7 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 - List keys with metadata 📋
 - Enforce strong passphrase policies 🛡️
 
-### � **[NEW] Folder Encryption Manager**
+### � **Encryptor Manager**
 - 🔒 **Encrypt entire folder structures** with password protection
 - 📂 Recursive directory support with metadata preservation
 - 🔑 Secure key derivation (SHA-256)
@@ -80,7 +80,13 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 - 🗂️ Automatic folder structure creation
 - 📁 Decryption with output to separate directory
 
-### 📋 **[NEW] Activity Logging System**
+### 🧩 **[NEW]Decryptor Manager**
+- Decrypt functionality for cryptographic output testing
+- Bruteforce ⚠️ to evaluate password strength
+- Demonstrates vulnerabilities in weak or commonly used passwords
+- Intended for educational and security analysis purposes
+
+### 📋 **Activity Logging System**
 - 📝 **Complete audit trail** of all cryptographic operations
 - 🛡️ **Non-sensitive logging** - passwords/keys never recorded
 - 🔐 **Base64-encoded storage** for additional obfuscation
