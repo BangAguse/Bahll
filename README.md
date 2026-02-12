@@ -166,8 +166,6 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 - Safe module loading 🛡️
 - Folder-based plugin discovery 📁
 
-## Project Structure
-
 ## Architecture
 
 Bahll follows a **modular, CLI-first architecture**:
