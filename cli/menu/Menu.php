@@ -1011,14 +1011,14 @@ class Menu
     private function menuInfo(): void
     {
         Output::section("Application Info");
-        Output::writeln("Version: 0.3.0");
+        Output::writeln("Version: 1.0");
         Output::writeln("Author: Muh. Agus Tri Ananda");
     }
 
     private function menuHelp(): void
     {
         Output::section("Help & Documentation");
-        Output::writeln("Bahll - Educational Cryptography Toolkit v0.3.0");
+        Output::writeln("Bahll - Educational Cryptography Toolkit v1.0");
         Output::writeln("");
         Output::writeln("━━━ CORE MODULES ━━━");
         Output::writeln("");
@@ -1094,6 +1094,402 @@ class Menu
         Output::writeln("  Brute-force decrypt a file:");
         Output::writeln("    [10] → place encrypted file in storage/Data_decrypt → [2] (Bruteforce)");
         Output::writeln("");
-        Output::writeln("For more information, visit: https://github.com/yourusername/bahll");
+        Output::writeln("For more information, visit: https://github.com/BangAguse/Bahll");
+    }
+
+    
+    
+    public function executeHashCommand(string $hashType, ?string $algorithm, ?string $data): void
+    {
+        if (empty($data)) {
+            Output::error("No data provided for hashing");
+            return;
+        }
+
+        switch (strtolower($hashType)) {
+            case 'sha1':
+                $hash = Hash::sha1($data);
+                Output::warning("SHA-1 is deprecated and insecure");
+                Output::result('SHA-1 Hash', $hash);
+                $this->logger->logHash('SHA-1');
+                break;
+            case 'sha256':
+                $hash = Hash::sha256($data);
+                Output::result('SHA-256 Hash', $hash);
+                $this->logger->logHash('SHA-256');
+                break;
+            case 'sha512':
+                $hash = Hash::sha512($data);
+                Output::result('SHA-512 Hash', $hash);
+                $this->logger->logHash('SHA-512');
+                break;
+            case 'sha3':
+                $hash = Hash::sha3($data);
+                if (strpos($hash, '✖') === 0) {
+                    Output::error($hash);
+                } else {
+                    Output::result('SHA3-512 Hash', $hash);
+                    $this->logger->logHash('SHA3-512');
+                }
+                break;
+            case 'blake2':
+                $hash = Hash::blake2($data);
+                if (strpos($hash, '✖') === 0) {
+                    Output::error($hash);
+                } else {
+                    Output::result('BLAKE2 Hash', $hash);
+                    $this->logger->logHash('BLAKE2');
+                }
+                break;
+            case 'blake3':
+                $msg = Hash::blake3('');
+                Output::warning($msg);
+                break;
+            case 'hmac':
+                if (empty($algorithm)) {
+                    Output::error("HMAC requires algorithm parameter");
+                    return;
+                }
+                $hash = Hash::hmac($algorithm, $data, '');
+                Output::result("HMAC-$algorithm", $hash);
+                $this->logger->logHash("HMAC-$algorithm");
+                break;
+            case 'pbkdf2':
+                $hash = Hash::pbkdf2($data, null, 100000);
+                Output::result('PBKDF2 Derived Key', $hash);
+                $this->logger->logHash('PBKDF2');
+                break;
+            case 'bcrypt':
+                $hash = Hash::bcrypt($data);
+                Output::result('bcrypt Hash', $hash);
+                $this->logger->logHash('bcrypt');
+                break;
+            case 'scrypt':
+                $msg = Hash::scrypt('');
+                Output::warning($msg);
+                break;
+            case 'argon2':
+                $hash = Hash::argon2id($data);
+                if (strpos($hash, '✖') === 0) {
+                    Output::error($hash);
+                } else {
+                    Output::result('Argon2id Hash', $hash);
+                    $this->logger->logHash('Argon2id');
+                }
+                break;
+            default:
+                Output::error("Unknown hash algorithm: $hashType");
+        }
+    }
+
+    public function executeSymmetricCommand(string $action, string $algorithm, ?string $data, ?string $key): void
+    {
+        if (empty($data)) {
+            Output::error("No data provided");
+            return;
+        }
+
+        if (strtolower($action) === 'encrypt') {
+            if (strtolower($algorithm) === 'aes-256-gcm') {
+                $res = Symmetric::encryptAesGcm($data, $key ?: null);
+                Output::result('Encrypted Data (AES-256-GCM)', $res);
+            } elseif (strtolower($algorithm) === 'aes-256-cbc') {
+                $res = Symmetric::encryptAesCbcWithHmac($data, $key ?: '');
+                Output::result('Encrypted Data (AES-256-CBC)', $res);
+            } else {
+                Output::error("Unknown algorithm: $algorithm");
+            }
+        } elseif (strtolower($action) === 'decrypt') {
+            if (strtolower($algorithm) === 'aes-256-gcm') {
+                $out = Symmetric::decryptAesGcm($data, $key ?: null);
+                if ($out === false) {
+                    Output::error('Decryption failed - wrong password or corrupted data');
+                } else {
+                    Output::result('Decrypted Data (AES-256-GCM)', $out);
+                }
+            } elseif (strtolower($algorithm) === 'aes-256-cbc') {
+                $out = Symmetric::decryptAesCbcWithHmac($data, $key ?: '');
+                if ($out === false) {
+                    Output::error('Decryption failed - wrong password or MAC verification failed');
+                } else {
+                    Output::result('Decrypted Data (AES-256-CBC)', $out);
+                }
+            } else {
+                Output::error("Unknown algorithm: $algorithm");
+            }
+        } else {
+            Output::error("Unknown action: $action");
+        }
+    }
+
+    public function executeAsymmetricCommand(string $action, array $args): void
+    {
+        switch (strtolower($action)) {
+            case 'generate':
+                $type = $args[0] ?? 'rsa-2048';
+                if (strpos(strtolower($type), 'rsa') === 0) {
+                    $bits = (int)preg_replace('/\D/', '', $type) ?: 2048;
+                    $passphrase = $args[1] ?? null;
+                    $kp = Asymmetric::generateRsa($bits, $passphrase);
+                    if (isset($kp['error'])) {
+                        Output::error($kp['error']);
+                    } else {
+                        Output::section("RSA-$bits Keypair Generated");
+                        Output::writeln("Private Key:\n" . $kp['private']);
+                        Output::writeln("\nPublic Key:\n" . $kp['public']);
+                        $this->logger->logKeyGeneration('RSA', $bits);
+                    }
+                } elseif (strpos(strtolower($type), 'ed25519') === 0) {
+                    $kp = Asymmetric::generateEd25519();
+                    if (isset($kp['error'])) {
+                        Output::error($kp['error']);
+                    } else {
+                        Output::section("Ed25519 Keypair Generated");
+                        Output::result('Private Key (hex)', $kp['private_hex']);
+                        Output::result('Public Key (hex)', $kp['public_hex']);
+                        $this->logger->logKeyGeneration('Ed25519');
+                    }
+                } else {
+                    Output::error("Unsupported key type: $type");
+                }
+                break;
+            case 'sign':
+                $sk = $args[0] ?? null;
+                $msg = $args[1] ?? null;
+                if (empty($sk) || empty($msg)) {
+                    Output::error("sign requires private key and message");
+                    return;
+                }
+                $sig = Asymmetric::signEd25519($sk, $msg);
+                if (empty($sig)) {
+                    Output::error('Signing failed');
+                    $this->logger->log('Ed25519 sign', 'failed');
+                } else {
+                    Output::result('Signature (base64)', base64_encode($sig));
+                    $this->logger->log('Ed25519 sign', 'success');
+                }
+                break;
+            case 'verify':
+                $pk = $args[0] ?? null;
+                $msg = $args[1] ?? null;
+                $sig_b64 = $args[2] ?? null;
+                if (empty($pk) || empty($msg) || empty($sig_b64)) {
+                    Output::error("verify requires public key, message, and signature");
+                    return;
+                }
+                $sig = base64_decode($sig_b64);
+                $ok = Asymmetric::verifyEd25519($pk, $msg, $sig);
+                if ($ok) {
+                    Output::success('Signature VALID');
+                    $this->logger->log('Ed25519 verify', 'success');
+                } else {
+                    Output::error('Signature INVALID');
+                    $this->logger->log('Ed25519 verify', 'failed');
+                }
+                break;
+            default:
+                Output::error("Unknown asymmetric action: $action");
+        }
+    }
+
+    public function executeKeyringCommand(string $action, array $args): void
+    {
+        Output::info("Keyring action: $action (CLI mode)");
+        
+        $this->menuKeyring(new Keyring());
+    }
+
+    public function executeEncodingCommand(string $encoding, ?string $data): void
+    {
+        if (empty($data)) {
+            Output::error("No data provided");
+            return;
+        }
+
+        switch (strtolower($encoding)) {
+            case 'base64':
+                $result = base64_encode($data);
+                Output::result('Base64 Encoded', $result);
+                break;
+            case 'base32':
+                $result = base_convert(bin2hex($data), 16, 32);
+                Output::result('Base32 Encoded', $result);
+                break;
+            case 'hex':
+                $result = bin2hex($data);
+                Output::result('Hexadecimal Encoded', $result);
+                break;
+            case 'url':
+                $result = urlencode($data);
+                Output::result('URL Encoded', $result);
+                break;
+            case 'html':
+                $result = htmlentities($data, ENT_QUOTES, 'UTF-8');
+                Output::result('HTML Encoded', $result);
+                break;
+            case 'json':
+                $result = json_encode($data);
+                Output::result('JSON Encoded', $result);
+                break;
+            default:
+                Output::error("Unknown encoding: $encoding");
+        }
+    }
+
+    public function executeRandomCommand(string $type, ?string $length): void
+    {
+        
+        if (strtolower($type) === 'uuid') {
+            
+            $bytes = random_bytes(16);
+            $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40); 
+            $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80); 
+            $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+            Output::result("UUID v4", $uuid);
+            return;
+        }
+
+        $len = (int)($length ?? 32);
+        if ($len <= 0) {
+            Output::error("Length must be positive");
+            return;
+        }
+
+        switch (strtolower($type)) {
+            case 'bytes':
+                $result = bin2hex(random_bytes($len));
+                Output::result("Random Bytes ($len bytes, hex)", $result);
+                break;
+            case 'int':
+                $max = $len ?: 1000;
+                $result = random_int(0, $max);
+                Output::result("Random Integer (0-$max)", $result);
+                break;
+            case 'string':
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                $result = '';
+                for ($i = 0; $i < $len; $i++) {
+                    $result .= $chars[random_int(0, strlen($chars) - 1)];
+                }
+                Output::result("Random String ($len chars)", $result);
+                break;
+            case 'hex':
+                $result = bin2hex(random_bytes($len));
+                Output::result("Random Hex ($len bytes)", $result);
+                break;
+            case 'password':
+                
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+                $result = '';
+                for ($i = 0; $i < $len; $i++) {
+                    $result .= $chars[random_int(0, strlen($chars) - 1)];
+                }
+                Output::result("Secure Password ($len chars)", $result);
+                break;
+            case 'token':
+                
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                $result = '';
+                for ($i = 0; $i < $len; $i++) {
+                    $result .= $chars[random_int(0, strlen($chars) - 1)];
+                }
+                Output::result("Security Token ($len chars)", $result);
+                break;
+            default:
+                Output::error("Unknown random type: $type");
+        }
+    }
+
+    public function executeAuditCommand(string $action, array $args): void
+    {
+        switch (strtolower($action)) {
+            case 'check':
+                Output::section("System Security Check");
+                Output::success("OpenSSL: " . (extension_loaded('openssl') ? 'Enabled' : 'Disabled'));
+                Output::success("Sodium: " . (extension_loaded('sodium') ? 'Enabled' : 'Disabled'));
+                Output::success("PHP Version: " . PHP_VERSION);
+                Output::success("System OK");
+                break;
+            case 'hash-file':
+                $file = $args[0] ?? null;
+                $algo = $args[1] ?? 'sha256';
+                if (empty($file) || !file_exists($file)) {
+                    Output::error("File not found: $file");
+                    return;
+                }
+                $hash = hash_file($algo, $file);
+                Output::result("$algo File Hash", $hash);
+                break;
+            default:
+                Output::error("Unknown audit action: $action");
+        }
+    }
+
+    public function executeSecretsCommand(string $action, array $args): void
+    {
+        Output::info("Secrets action: $action (CLI mode)");
+        
+        Output::warning("For full secrets management, use interactive mode");
+    }
+
+    public function executeEncryptorCommand(string $action, array $args): void
+    {
+        switch (strtolower($action)) {
+            case 'encrypt':
+                $this->performFolderEncryption();
+                break;
+            case 'view':
+                $this->viewFolderContents('encrypt');
+                break;
+            case 'list':
+                $this->viewFolderContents('encrypt');
+                break;
+            default:
+                Output::error("Unknown encryptor action: $action");
+        }
+    }
+
+    public function executeDecryptorCommand(string $action, array $args): void
+    {
+        switch (strtolower($action)) {
+            case 'decrypt':
+                $this->performFolderDecryption();
+                break;
+            case 'view':
+                $this->viewDataDecryptContents();
+                break;
+            case 'list':
+                $this->viewDataDecryptContents();
+                break;
+            case 'bruteforce':
+                $this->performBruteforce();
+                break;
+            default:
+                Output::error("Unknown decryptor action: $action");
+        }
+    }
+
+    public function executeLogsCommand(string $action, array $args): void
+    {
+        switch (strtolower($action)) {
+            case 'view':
+                $count = (int)($args[0] ?? 10);
+                $this->displayRecentLogs($count);
+                break;
+            case 'list':
+                $this->displayAllLogs();
+                break;
+            case 'export':
+                $this->exportLogs();
+                break;
+            case 'stats':
+                $this->showLogStats();
+                break;
+            case 'clear':
+                $this->clearLogs();
+                break;
+            default:
+                Output::error("Unknown logs action: $action");
+        }
     }
 }
