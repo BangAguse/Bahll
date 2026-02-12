@@ -63,8 +63,9 @@ Whether you're a developer integrating crypto into your app, a security engineer
 3. **System Command Setup** - Install `bahll` as a direct terminal command (no `php` prefix)
    ```bash
    # Make it available globally
+   php setup.php
+   # or
    chmod +x /path/to/Bahll/bahll.php
-   sudo ln -sf /path/to/Bahll/bahll.php /usr/local/bin/bahll
    
    # Now run anywhere:
    bahll --help
