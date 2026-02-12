@@ -168,26 +168,6 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 
 ## Project Structure
 
-```
-Bahll/
-├─ bahll.php          # Main entry point
-├─ setup.php          # Environment setup script
-├─ composer.json      # PHP dependencies config
-├─ core/              # Core crypto modules
-│  ├─ crypto/         # Hash, Symmetric, Asymmetric
-│  ├─ keyring/        # Encrypted key storage
-├─ cli/               # CLI interface
-│  ├─ menu/           # Interactive menus
-│  ├─ input/          # Input handling
-│  ├─ output/         # Output rendering
-├─ utils/             # Utilities (e.g., constant-time compare)
-├─ storage/           # Encrypted data storage
-├─ plugins/           # Extensible plugins
-├─ tests/             # Unit tests
-├─ docs/assets/       # Documentation assets
-└─ README.md          # This file
-```
-
 ## Architecture
 
 Bahll follows a **modular, CLI-first architecture**:
