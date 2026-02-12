@@ -4,21 +4,86 @@ All notable changes to the Bahll project will be documented in this file.
 
 ---
 
-## [0.3.0] - 2026-02-08
+## [1.0] - 2026-02-13
 
-### ✨ **NEW FEATURES**
+### 🎯 **RELEASE HIGHLIGHTS - Major Feature Release**
 
-- **Decryptor Manager** - New menu (10) for advanced decryption operations
-  - View encrypted files in `storage/Data_decrypt`
-  - Wordlist-based brute-force password cracking (~500 common passwords)
-  - Single password decryption for bulk files
-  - View decrypted outputs in `storage/Decrypted`
-- **Keyring Key Removal** - Added ability to delete keys from encrypted keyring storage
-- **Storage Layout Restructuring** - New directories for organized encryption workflow:
-  - `storage/Data_encrypt` - Input files for encryption
-  - `storage/Data_decrypt` - Encrypted files to decrypt
-  - `storage/Decrypted` - Output of successful decryption
-  - `storage/Encrypted` - Output of encryption process
+**Bahll v1.0: From Interactive-Only to Hybrid Dual-Mode Tool**
+
+Bahll v1.0 is a **production-ready milestone** introducing a massive shift in capability: adding **direct CLI command execution** alongside the traditional interactive menu, without any changes to core source code. This version also enables **system-wide executable installation**, making `bahll` a first-class citizen in terminal environments.
+
+**What Changed:**
+- ✅ Users can now run crypto operations **without navigating menus**
+- ✅ Supports modern **flag-style commands** (`--hash`, `--encrypt`, `--decrypt`, etc.)
+- ✅ Can be **installed as a system command** (no `php` prefix needed)
+- ✅ Fully **backward compatible** with interactive mode
+- ✅ All cryptographic operations are **fully tested and verified**
+- ✅ Production-ready code with **cleaned comments** and **zero syntax errors**
+
+### ✨ **NEW FEATURES - Major CLI Overhaul**
+
+#### 1. Dual-Mode Operation (Interactive + Direct CLI)
+The same Bahll tool now works in two ways:
+
+**Interactive Mode (Original)**
+```bash
+php bahll.php                    # Full menu-driven interface
+```
+
+**Direct CLI Mode (NEW)**
+```bash
+# Modern flag-based commands
+bahll --hash --algo=sha256 --data="hello"
+bahll --encrypt --algo=aes-256-gcm --data=/path/to/file --key=pass
+bahll --decrypt --algo=aes-256-gcm --data=/path/to/file.bahll --key=pass
+bahll --random --type=bytes --length=32
+bahll --bruteforce --path=/path/to/encrypted_folder
+```
+
+**Positional Mode (Legacy, Still Supported)**
+```bash
+php bahll.php hash sha256 "data"
+php bahll.php encrypt aes-256-gcm "data" "key"
+php bahll.php decrypt aes-256-gcm "blob" "key"
+```
+
+#### 2. System Command Installation (Executable Setup)
+Bahll can now be installed as a native terminal command:
+
+**System-Wide Installation**
+```bash
+chmod +x /path/to/Bahll/bahll.php
+sudo ln -sf /path/to/Bahll/bahll.php /usr/local/bin/bahll
+```
+
+**Per-User Installation (No sudo)**
+```bash
+mkdir -p "$HOME/bin"
+cat > "$HOME/bin/bahll" <<'EOF'
+#!/bin/sh
+php /path/to/Bahll/bahll.php "$@"
+EOF
+chmod +x "$HOME/bin/bahll"
+```
+
+After installation, use Bahll like any CLI tool:
+```bash
+bahll --help
+bahll --version
+bahll --hash --algo=sha256 --data="test"
+```
+
+#### 3. Enhanced CLI Features
+- **Long-flag Parsing** - Recommended modern style: `--algo=sha256`, `--data=value`
+- **File-based Workflows** - Pass file paths → auto-confirmation + optional passphrase
+- **Smart Output Naming** - Encrypted: `.bahll`, Decrypted: `.dec` (extracted from original name)
+- **Directory Bruteforce** - Safe traversal, ethical confirmation prompt, remote wordlist download
+- **Integrated Help** - Install instructions built into `--help` output
+
+#### 4. Menu & Manager Improvements
+- **Decryptor Manager** - Advanced decryption with wordlist brute-force (~500 passwords)
+- **Keyring Enhancements** - Key removal, improved security handling
+- **Storage Restructuring** - Organized encryption workflow directories
 
 ### 🔧 **IMPROVEMENTS**
 
@@ -26,6 +91,10 @@ All notable changes to the Bahll project will be documented in this file.
 - Improved menu text clarity (removed repetitive descriptions)
 - Fixed Keyring salt handling for correct libsodium compliance
 - AEAD nonce separation from password hashing salt
+- **Code cleanup:** All comments removed from 20 PHP files, syntax verified
+- **Consistent versioning:** All version references updated to 1.0
+- Unified version output across CLI, interactive menu, and info display
+- Installation instructions integrated into help system
 
 ### 🐛 **BUG FIXES**
 
@@ -33,6 +102,16 @@ All notable changes to the Bahll project will be documented in this file.
 - Fixed XChaCha20-Poly1305 nonce handling in Keyring
 - Fixed Audit menu infinite loop
 - Fixed Help and Info menus looping behavior
+- Fixed file prompt helpers (`askYesNo`, `askOptionalPassphrase`)
+- Fixed decrypted file naming to strip `.bahll` extension properly
+- Fixed stray code and restored proper method declarations
+
+### 📚 **Documentation Updates**
+
+- README.md: Added comprehensive CLI usage section with examples
+- CHANGELOG.md: Detailed release notes for v1.0 milestone
+- CLI_DOCUMENTATION.md: Complete CLI reference and examples
+- CLI_QUICK_REFERENCE.md: Quick lookup for common commands
 
 ---
 
