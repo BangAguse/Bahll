@@ -426,7 +426,7 @@ For bugs or features, open an issue at [github.com/BangAguse/Bahll/issues](https
 
 ## Support & Donations
 
-If you find RACON useful, consider supporting its development via donation.
+If you find Bahll useful, consider supporting its development via donation.
 
 <p align="center">
   <img src="https://i.ibb.co.com/21mcgrL6/Untitled-design-20251229-042141-0000.png" alt="DANA Logo" width="140"><br>
