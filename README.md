@@ -424,6 +424,17 @@ For bugs or features, open an issue at [github.com/BangAguse/Bahll/issues](https
 **Repository:** [github.com/BangAguse/Bahll](https://github.com/BangAguse/Bahll)  
 **Author:** [@BangAguse](https://github.com/BangAguse)
 
+## Support & Donations
+
+If you find RACON useful, consider supporting its development via donation.
+
+<p align="center">
+  <img src="https://i.ibb.co.com/21mcgrL6/Untitled-design-20251229-042141-0000.png" alt="DANA Logo" width="140"><br>
+  <b>DANA:</b> 085756444803
+</p>
+
+Your support helps keep the project maintained and improved.
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
