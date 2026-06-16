@@ -1011,14 +1011,14 @@ class Menu
     private function menuInfo(): void
     {
         Output::section("Application Info");
-        Output::writeln("Version: 1.0");
+        Output::writeln("Version: 1.1");
         Output::writeln("Author: Muh. Agus Tri Ananda");
     }
 
     private function menuHelp(): void
     {
         Output::section("Help & Documentation");
-        Output::writeln("Bahll - Educational Cryptography Toolkit v1.0");
+        Output::writeln("Bahll - Educational Cryptography Toolkit v1.1");
         Output::writeln("");
         Output::writeln("━━━ CORE MODULES ━━━");
         Output::writeln("");
