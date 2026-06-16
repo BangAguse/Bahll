@@ -1,3 +1,4 @@
+
 <div align="center">
   <img src="docs/assets/bahll_banner.png" alt="Bahll Banner" width="600" />
 
@@ -10,7 +11,7 @@
     <img alt="Status" src="https://img.shields.io/badge/status-stable-green.svg" />
     <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
     <img alt="Security" src="https://img.shields.io/badge/security-fail--closed-red.svg" />
-    <img alt="Version" src="https://img.shields.io/badge/version-1.0-blue.svg" />
+    <img alt="Version" src="https://img.shields.io/badge/version-1.1-blue.svg" />
   </p>
 
   <!-- Demo GIF -->
@@ -40,9 +41,9 @@ Bahll is a **terminal defensive cryptography toolkit** designed for developers w
 
 Whether you're a developer integrating crypto into your app, a security engineer auditing secrets, or just experimenting with cryptography, Bahll gives you authority over your crypto workflows.
 
-### 🆕 What's New in v1.0 - Hybrid CLI + Interactive Mode
+### 🆕 What's New in v1.1 - REST API Server Integration
 
-**Bahll v1.0 transforms from interactive-only to a full-featured dual-mode tool:**
+**Bahll v1.1 adds a production-ready REST API Server to the dual-mode tool:**
 
 1. **Interactive Mode** - Traditional menu-driven interface
    ```bash
@@ -63,9 +64,8 @@ Whether you're a developer integrating crypto into your app, a security engineer
 3. **System Command Setup** - Install `bahll` as a direct terminal command (no `php` prefix)
    ```bash
    # Make it available globally
-   php setup.php
-   # or
    chmod +x /path/to/Bahll/bahll.php
+   sudo ln -sf /path/to/Bahll/bahll.php /usr/local/bin/bahll
    
    # Now run anywhere:
    bahll --help
@@ -165,6 +165,28 @@ Bahll offers a comprehensive suite of cryptographic tools, organized into intuit
 - Extensible architecture for custom crypto components 🧩
 - Safe module loading 🛡️
 - Folder-based plugin discovery 📁
+
+## Project Structure
+
+```
+Bahll/
+├─ bahll.php          # Main entry point
+├─ setup.php          # Environment setup script
+├─ composer.json      # PHP dependencies config
+├─ core/              # Core crypto modules
+│  ├─ crypto/         # Hash, Symmetric, Asymmetric
+│  ├─ keyring/        # Encrypted key storage
+├─ cli/               # CLI interface
+│  ├─ menu/           # Interactive menus
+│  ├─ input/          # Input handling
+│  ├─ output/         # Output rendering
+├─ utils/             # Utilities (e.g., constant-time compare)
+├─ storage/           # Encrypted data storage
+├─ plugins/           # Extensible plugins
+├─ tests/             # Unit tests
+├─ docs/assets/       # Documentation assets
+└─ README.md          # This file
+```
 
 ## Architecture
 
@@ -424,21 +446,10 @@ For bugs or features, open an issue at [github.com/BangAguse/Bahll/issues](https
 **Repository:** [github.com/BangAguse/Bahll](https://github.com/BangAguse/Bahll)  
 **Author:** [@BangAguse](https://github.com/BangAguse)
 
-## Support & Donations
-
-If you find Bahll useful, consider supporting its development via donation.
-
-<p align="center">
-  <img src="https://i.ibb.co.com/21mcgrL6/Untitled-design-20251229-042141-0000.png" alt="DANA Logo" width="140"><br>
-  <b>DANA:</b> 085756444803
-</p>
-
-Your support helps keep the project maintained and improved.
-
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-*Built with ❤️ for secure development workflows. Replace the demo GIF with a repository asset for offline viewing.*
+*Built with ❤️ for secure development workflows.*
