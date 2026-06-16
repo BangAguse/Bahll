@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  bahll-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bahll-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./storage:/app/storage
+      - ./api:/app/api
+      - ./core:/app/core
+      - ./utils:/app/utils
+    environment:
+      - BAHLL_API_HOST=0.0.0.0
+      - BAHLL_API_PORT=8000
+      - BAHLL_JWT_SECRET=${BAHLL_JWT_SECRET:-bahll-development-secret-change-in-production}
+      - BAHLL_DB_PATH=/app/storage/bahll.db
+      - BAHLL_LOG_LEVEL=${BAHLL_LOG_LEVEL:-info}
+      - BAHLL_CORS_ORIGINS=${BAHLL_CORS_ORIGINS:-*}
+    networks:
+      - bahll-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: PostgreSQL for production audit logs (alternative to SQLite)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: bahll-postgres
+  #   environment:
+  #     - POSTGRES_DB=bahll
+  #     - POSTGRES_USER=bahll
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD:-bahll-secure-password}
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - bahll-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U bahll"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+networks:
+  bahll-network:
+    driver: bridge
+
+volumes:
+  # postgres-data:
