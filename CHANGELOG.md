@@ -4,6 +4,68 @@ All notable changes to the Bahll project will be documented in this file.
 
 ---
 
+## [1.1] - 2026-06-16
+
+### 🎯 **RELEASE HIGHLIGHTS - REST API Integration**
+
+**Bahll v1.1: Enterprise-Ready REST API Server**
+
+Bahll v1.1 introduces a **production-ready REST API server**, enabling seamless integration with web applications, microservices, and cloud platforms. The tool now operates in **three modes**: Interactive CLI, Direct CLI Commands, and REST API.
+
+**What's New:**
+- ✅ **22 REST API endpoints** for all cryptographic operations
+- ✅ **JWT Authentication** with API key management
+- ✅ **Rate Limiting** (100 requests/minute per key)
+- ✅ **Audit Logging** with detailed operation tracking
+- ✅ **SQLite Database** for persistence (PostgreSQL ready)
+- ✅ **Docker Support** with docker-compose configuration
+- ✅ **CORS Protection** for web application security
+- ✅ Full backward compatibility with v1.0
+
+### ✨ **NEW FEATURES**
+
+#### 1. REST API Server
+- Slim Framework 4.12-based lightweight HTTP API
+- Endpoints for encryption, decryption, hashing, and key management
+- Health checks and status monitoring
+- Complete API documentation with examples
+
+#### 2. Authentication & Authorization
+- API key generation and management
+- JWT tokens with 24-hour expiration
+- Secure key hashing (SHA256)
+- API key revocation without deletion
+
+#### 3. Rate Limiting & Tracking
+- Per-key rate limiting (100 req/min)
+- Response headers showing usage statistics
+- Automatic window cleanup
+
+#### 4. Audit Logging
+- Complete operation history
+- Execution time tracking
+- Success/failure status
+- Error message capture
+- Statistics and analytics
+
+#### 5. Docker Support
+- Lightweight Alpine PHP 8.1 image
+- Docker Compose orchestration
+- Health checks built-in
+- Easy deployment and scaling
+
+### 📦 **DEPENDENCIES ADDED**
+- slim/slim: ^4.12 - HTTP framework
+- slim/psr7: ^1.6 - PSR-7 support
+- firebase/php-jwt: ^6.9 - JWT handling
+
+### 📚 **DOCUMENTATION**
+- `API_DOCUMENTATION.md` - Complete API reference
+- `API_QUICKSTART.md` - Quick start guide with examples
+- `API_INTEGRATION_SUMMARY.md` - Implementation details
+
+---
+
 ## [1.0] - 2026-02-13
 
 ### 🎯 **RELEASE HIGHLIGHTS - Major Feature Release**
