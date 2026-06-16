@@ -1197,7 +1197,7 @@ HELP;
     private function showVersion(): void
     {
         Output::banner();
-        Output::writeln("Bahll Cryptography Suite v1.0.0");
+        Output::writeln("Bahll Cryptography Suite v1.1");
         Output::writeln("PHP Version: " . PHP_VERSION);
         Output::writeln("OpenSSL: " . (extension_loaded('openssl') ? 'Enabled' : 'Disabled'));
         Output::writeln("Sodium: " . (extension_loaded('sodium') ? 'Enabled' : 'Disabled'));
